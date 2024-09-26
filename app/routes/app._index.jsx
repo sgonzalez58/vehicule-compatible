@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { json } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -15,11 +15,14 @@ import {
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+import db from "../db.server";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
-
-  return null;
+  let marque = await db.marque.findFirst();
+  let modele = await db.modele.findFirst();
+  let produit = await db.produit.findFirst();
+  return json({"marque" : marque, "modele" : modele, "produit" : produit});
 };
 
 export const action = async ({ request }) => {
@@ -88,6 +91,7 @@ export const action = async ({ request }) => {
 };
 
 export default function Index() {
+  const info_db = useLoaderData();
   const fetcher = useFetcher();
   const shopify = useAppBridge();
   const isLoading =
@@ -134,12 +138,18 @@ export default function Index() {
                   </Text>
                 </BlockStack>
                 <BlockStack gap="200">
-                  <Text as="h3" variant="headingMd">
-                    Commencez par gérer vos véhicules.
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Vous devrez tout d'abord ajouter les marques des véhicules et ensuite vous pourrez des modèles à ces marques.
-                  </Text>
+                  {(info_db.marque == null || info_db.modele == null) && (
+                    <Text as="h3" variant="headingMd">
+                      Commencez par gérer vos véhicules.
+                    </Text>
+                  )}
+                  {info_db.marque == null && (
+                    <Text as="p" variant="bodyMd">
+                      Vous devrez tout d'abord ajouter une marque de véhicule.
+                    </Text>
+                    
+                  )}
+                  
                 </BlockStack>
                 <InlineStack gap="300">
                   <Button url="/app/vehicule">

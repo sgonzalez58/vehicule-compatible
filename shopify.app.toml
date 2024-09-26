@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://considerable-lauderdale-party-wrapped.trycloudflare.com"
+application_url = "https://descriptions-rocket-chronic-graduated.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products"
 
 [auth]
 redirect_urls = [
-  "https://considerable-lauderdale-party-wrapped.trycloudflare.com/auth/callback",
-  "https://considerable-lauderdale-party-wrapped.trycloudflare.com/auth/shopify/callback",
-  "https://considerable-lauderdale-party-wrapped.trycloudflare.com/api/auth/callback"
+  "https://descriptions-rocket-chronic-graduated.trycloudflare.com/auth/callback",
+  "https://descriptions-rocket-chronic-graduated.trycloudflare.com/auth/shopify/callback",
+  "https://descriptions-rocket-chronic-graduated.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

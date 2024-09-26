@@ -30,3 +30,23 @@ model Session {
   collaborator  Boolean?  @default(false)
   emailVerified Boolean?  @default(false)
 }
+
+model Marque {
+  id            Int       @id @default(autoincrement())
+  modeles       Modele[]
+  name          String    @unique
+}
+
+model Modele {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  marque        Marque    @relation(fields: [marqueId], references: [id])
+  marqueId      Int
+  produits      Produit[]
+}
+
+model Produit {
+  id            Int       @id @default(autoincrement())
+  productId     String    @unique
+  modeles       Modele[]
+}
