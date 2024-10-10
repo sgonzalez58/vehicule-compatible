@@ -48,5 +48,7 @@ model Modele {
 model Produit {
   id            Int       @id @default(autoincrement())
   productId     String    @unique
+  productName   String
+  productImage  String
   modeles       Modele[]
 }
