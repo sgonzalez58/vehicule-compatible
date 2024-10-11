@@ -4,9 +4,9 @@ import {
   Card,
   Layout,
   Page,
-  Text,
   EmptyState,
   IndexTable,
+  Thumbnail,
 } from "@shopify/polaris";
 import { ImageIcon } from "@shopify/polaris-icons"
 
@@ -34,6 +34,12 @@ const AucunProduit = ({ onAction }) => (
     <p>Permets à vos clients de trouver les produits compatibles avec leur véhicule.</p>
   </EmptyState>
 );
+
+function truncate(str, { length = 25 } = {}) {
+  if (!str) return "";
+  if (str.length <= length) return str;
+  return str.slice(0, length) + "…";
+}
 
 const TableProduit = ({ produits }) => (
   <IndexTable
@@ -68,7 +74,7 @@ const TableProduitsLigne = ({ produit }) => (
       {truncate(produit.productName)}
     </IndexTable.Cell>
     <IndexTable.Cell>
-      {produit.modeles.length}
+      {produit.modeles ? count(produit.modeles) : 0}
     </IndexTable.Cell>
     <IndexTable.Cell>
       <Link to={`/app/produits/${produit.id}`}>Modifier</Link>

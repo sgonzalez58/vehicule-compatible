@@ -1,7 +1,14 @@
 import db from "../db.server";
 
 export async function getProduit(id) {
-  const produit = await db.produit.findFirst({ where: { id } });
+  const produit = await db.produit.findUnique({ 
+    where: {
+      id: id
+    },
+    include: {
+      modeles: true
+    }
+  });
 
   if (!produit) {
     return null;
@@ -23,7 +30,7 @@ export async function getProduits() {
 export function validateProduit(data) {
   const errors = {};
 
-  if (!data.produitId) {
+  if (!data.productId) {
     errors.produit = "Vous devez indiquer le produit de votre boutique.";
   }
 

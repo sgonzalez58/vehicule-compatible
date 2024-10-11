@@ -17,6 +17,12 @@ import {
   PageActions,
   InlineStack,
   Select,
+  Button,
+  Bleed,
+  Divider,
+  Thumbnail,
+  EmptyState,
+  IndexTable,
 } from "@shopify/polaris";
 
 import db from "../db.server";
@@ -25,12 +31,11 @@ import { getMarques } from "../models/marque.server";
 
 import { getModeles } from "../models/modele.server";
 import { getProduit, validateProduit } from "../models/produit.server";
-
 export async function loader({ params }) {
 
   if (params.id === "new") {
     return json({
-      produit: { destination : "produit", name: "" },
+      produit: { destination : "produit", productId: null, productName: "", productImage: "", modeles: []},
       marques: await getMarques(),
       modeles: await getModeles()
     });
@@ -58,27 +63,27 @@ export async function action({ request, params }) {
     await db.produit.delete({ where: { id: Number(params.id) } });
     return redirect("/app/vehicule");
   }
-
+  
   const errors = validateProduit(data);
 
   if (errors) {
     return json({ errors }, { status: 422 });
   }
 
-  const modele =
+  const produit =
     params.id === "new"
-      ? await db.modele.create({ data })
-      : await db.modele.update({ where: { id: Number(params.id) }, data });
+      ? await db.produit.create({ data })
+      : await db.produit.update({ where: { id: Number(params.id) }, data });
 
-  return redirect(`/app/vehicule`);
+  return redirect(`/app/produit`);
 }
 
 export default function modeleForm() {
   const errors = useActionData()?.errors || {};
 
-  const { modele = {}, marques = []} = useLoaderData();
-  const [formState, setFormState] = useState(modele || {});
-  const [cleanFormState, setCleanFormState] = useState(modele || {});
+  const { produit = {}, modeles = [], marques = []} = useLoaderData();
+  const [formState, setFormState] = useState(produit || {});
+  const [cleanFormState, setCleanFormState] = useState(produit || {});
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
 
   const nav = useNavigation();
@@ -88,32 +93,125 @@ export default function modeleForm() {
     nav.state === "submitting" && nav.formData?.get("action") === "delete";
 
   const navigate = useNavigate();
-  const submit = useSubmit();
+
+  async function selectProduct() {
+    const products = await window.shopify.resourcePicker({
+      type: "product",
+      action: "select",
+    });
+
+    if (products) {
+      const { images, id, title } = products[0];
+      
+      setFormState({
+        ...formState,
+        productId: id,
+        productName: title,
+        productImage: images[0]?.originalSrc,
+      })
+    }
+  }
 
   useEffect(() => {
-    if (!formState.marqueId && marques.length > 0) {
+    if (!formState.modeles && modeles.length > 0) {
       setFormState((prevState) => ({
         ...prevState,
-        marqueId: marques[0].id,
-        marqueName: marques[0].name,
+        modeles: {
+          Connect: {
+            where: {
+              id: modeles[0].id
+            }
+          }
+        }
       }));
     }
   }, [marques, formState.marqueId]);
 
-  function handleMarqueChange(selectedMarqueId) {
-    const selectedMarque = marques.find((marque) => marque.id === Number(selectedMarqueId));
-
+  function handleModeleAdd(selectedModeleId) {
     setFormState({
       ...formState,
-      marqueId: selectedMarque.id,
-      marqueName: selectedMarque.name,
+      modeles: {
+        Connect: {
+          where: {
+            id: selectedModeleId
+          }
+        }
+      }
     });
   }
+  
+  const AucunModele = ({ onAction }) => (
+    <EmptyState
+      heading="Ajouter les véhicules auxquels lier vos produits"
+      action={{
+        content: "Ajouter un véhicule",
+        onAction,
+      }}
+      image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+    >
+      <p>Permets à vos clients de trouver les produits compatibles avec leur véhicule.</p>
+      <Select
+        label="Sélectionner un véhicule"
+        options={modeles.map((modele) => ({
+          label: marques.find((marque) => marque.id === modele.id).name + ' ' + modele.name,
+          value: modele.id,
+        }))}
+        onChange={handleModeleAdd}
+        value={String(formState.marqueId || "")}
+        error={errors.marqueId}
+      />
+    </EmptyState>
+  );
+  
+  const TableModeles = ({ modeles, marques }) => (
+    <IndexTable
+      resourceName={{
+        singular: "Modèle",
+        plural: "Modèles",
+      }}
+      itemCount={modeles.length}
+      headings={[
+        { title: "Nom" },
+        { title: "Modifier" },
+      ]}
+    >
+      {modeles.map((modele) => (
+        <TableModelesLigne key={modele.id} modele={modele} marque={marques.find((marque) => marque.id === modele.marqueId)}/>
+      ))}
+    </IndexTable>
+  );
+  
+  const TableModelesLigne = ({ modele, marque }) => (
+    <IndexTable.Row id={modele.id} position={modele.id}>
+      <IndexTable.Cell>
+        {modele.marqueDeleted ? (
+          <InlineStack align="start" gap="200">
+            <span style={{ width: "20px" }}>
+              <Icon source={AlertDiamondIcon} tone="critical" />
+            </span>
+            <Text tone="critical" as="span">
+              Sa marque de véhicule a été supprimée
+            </Text>
+          </InlineStack>
+        ) : (
+          marque.name + ' ' + modele.name
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Link to={`/app/modeles/${modele.id}`}>Modifier</Link>
+      </IndexTable.Cell>
+    </IndexTable.Row>
+  );
+
+  
+  const submit = useSubmit();
 
   function handleSave() {
     const data = {
-      name: formState.name,
-      marqueId: formState.marqueId
+      productId: formState.productId,
+      productName: formState.productName,
+      productImage: formState.productImage,
+      modeles: formState.modeles
     };
 
     setCleanFormState({ ...formState });
@@ -122,9 +220,9 @@ export default function modeleForm() {
 
   return (
     <Page>
-      <ui-title-bar title={modele.id ? "Modifier un modèle" : "Ajouter un modèle"}>
+      <ui-title-bar title={produit.id ? "Modifier un produit" : "Choisir un produit à lier"}>
         <button variant="breadcrumb" onClick={() => navigate("/app")}>
-          Modèle
+          Produits
         </button>
       </ui-title-bar>
       <Layout>
@@ -132,39 +230,47 @@ export default function modeleForm() {
           <BlockStack gap="500">
             <Card>
               <BlockStack gap="500">
-                <Text as={"h2"} variant="headingLg">
-                  Nom
-                </Text>
-                <TextField
-                  id="name"
-                  helpText="Le modèle du véhicule"
-                  label="name"
-                  labelHidden
-                  autoComplete="off"
-                  value={formState.name}
-                  onChange={(name) => setFormState({ ...formState, name })}
-                  error={errors.name}
-                />
-              </BlockStack>
-            </Card>
-            <Card>
-              <BlockStack gap="500">
                 <InlineStack align="space-between">
                   <Text as={"h2"} variant="headingLg">
-                    Marques
+                    Produit
                   </Text>
+                  {formState.productId ? (
+                    <Button variant="plain" onClick={selectProduct}>
+                      Changer le produit
+                    </Button>
+                  ) : null}
                 </InlineStack>
-                <Select
-                  label="Sélectionner une marque"
-                  options={marques.map((marque) => ({
-                    label: marque.name,
-                    value: String(marque.id),
-                  }))}
-                  onChange={handleMarqueChange}
-                  value={String(formState.marqueId || "")}
-                  error={errors.marqueId}
-                />
+                {formState.productId ? (
+                  <InlineStack blockAlign="center" gap="500">
+                    <Thumbnail
+                      source={formState.productImage || ImageIcon}
+                      alt={formState.productName}
+                    />
+                    <Text as="span" variant="headingMd" fontWeight="semibold">
+                      {formState.productName}
+                    </Text>
+                  </InlineStack>
+                ) : (
+                  <BlockStack gap="200">
+                    <Button onClick={selectProduct} id="select-product">
+                      Choisir le produit
+                    </Button>
+                    {errors.produit ? (
+                      <InlineError
+                        message={errors.produit}
+                        fieldID="myFieldID"
+                      />
+                    ) : null}
+                  </BlockStack>
+                )}
               </BlockStack>
+            </Card>
+            <Card padding="0">
+              {produit.modeles.length === 0 ? (
+                <AucunModele onAction={() => handleSave} />
+              ) : (
+                <TableModeles modeles={produit.modeles} marques={marques} />
+              )}
             </Card>
           </BlockStack>
         </Layout.Section>
@@ -174,7 +280,7 @@ export default function modeleForm() {
               {
                 content: "Delete",
                 loading: isDeleting,
-                disabled: !modele.id || !modele || isSaving || isDeleting,
+                disabled: !produit.id || !produit || isSaving || isDeleting,
                 destructive: true,
                 outline: true,
                 onAction: () =>

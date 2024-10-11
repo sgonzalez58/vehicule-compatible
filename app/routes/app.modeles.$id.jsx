@@ -55,6 +55,8 @@ export async function action({ request, params }) {
     return redirect("/app/vehicule");
   }
 
+  data.marqueId = Number(data.marqueId);
+
   const errors = validateModele(data);
 
 

@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://visit-cod-range-dancing.trycloudflare.com"
+application_url = "https://incentives-developing-budgets-its.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products"
 
 [auth]
 redirect_urls = [
-  "https://visit-cod-range-dancing.trycloudflare.com/auth/callback",
-  "https://visit-cod-range-dancing.trycloudflare.com/auth/shopify/callback",
-  "https://visit-cod-range-dancing.trycloudflare.com/api/auth/callback"
+  "https://incentives-developing-budgets-its.trycloudflare.com/auth/callback",
+  "https://incentives-developing-budgets-its.trycloudflare.com/auth/shopify/callback",
+  "https://incentives-developing-budgets-its.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
