@@ -20,11 +20,49 @@ export async function getProduit(id) {
 export async function getProduits() {
   const produits = await db.produit.findMany({
     orderBy: { id: "desc" },
+    include: { modeles: true }
   });
 
   if (produits.length === 0) return [];
 
   return produits;
+}
+
+export async function updateProduit(id, data){
+  if(data.modeleId){
+    return await db.produit.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        modeles: {
+          connect: { id: Number(data.modeleId) }
+        },
+      }
+    }))
+  }
+  if(data.deleteModeleId){
+    return await db.produit.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        modeles: {
+          disconnect: { id: Number(data.deleteModeleId) }
+        },
+      }
+    }))
+  }
+  return await db.produit.update(({
+    where: {
+      id: id,
+    },
+    data: {
+      productId: data.productId,
+      productName: data.productName,
+      productImage: data.productImage
+    },
+  }))
 }
 
 export function validateProduit(data) {

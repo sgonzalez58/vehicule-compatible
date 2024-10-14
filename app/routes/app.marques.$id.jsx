@@ -87,8 +87,8 @@ export default function marqueForm() {
   return (
     <Page>
       <ui-title-bar title={marque.id ? "Modifier une marque" : "Ajouter une marque"}>
-        <button variant="breadcrumb" onClick={() => navigate("/app")}>
-          Marque
+        <button variant="breadcrumb" onClick={() => navigate("/app/vehicule")}>
+          Véhicules
         </button>
       </ui-title-bar>
       <Layout>

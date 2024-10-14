@@ -1,10 +1,8 @@
 {
-  "ratings": {
-    "stars": {
-      "label": "Ratings"
-    },
+  "compatibilite_vehicule": {
+    "label": "Compatibilité véhicule",
     "home": {
-      "recommendationText": "Recommended Product!"
+      "recommendationText": "Vérifiez la compatibilité de votre véhicule !"
     }
   }
 }

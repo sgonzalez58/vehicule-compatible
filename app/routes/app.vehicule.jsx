@@ -8,7 +8,6 @@ import {
   EmptyState,
   IndexTable,
 } from "@shopify/polaris";
-import { getMarques } from "../models/marque.server";
 import { getModeles } from "../models/modele.server";
 import { authenticate } from "../shopify.server";
 
@@ -16,10 +15,9 @@ import { authenticate } from "../shopify.server";
 export async function loader({ request }) {
   await authenticate.admin(request);
   const modeles = await getModeles();
-  const marques = await getMarques();
+  console.log(modeles)
   return json({
-    modeles,
-    marques
+    modeles
   });
 }
 
@@ -36,7 +34,7 @@ const AucunModele = ({ onAction }) => (
   </EmptyState>
 );
 
-const TableModeles = ({ modeles, marques }) => (
+const TableModeles = ({ modeles }) => (
   <IndexTable
     resourceName={{
       singular: "Modèle",
@@ -45,16 +43,17 @@ const TableModeles = ({ modeles, marques }) => (
     itemCount={modeles.length}
     headings={[
       { title: "Nom" },
+      { title: "Total produits" },
       { title: "Modifier" },
     ]}
   >
     {modeles.map((modele) => (
-      <TableModelesLigne key={modele.id} modele={modele} marque={marques.find((marque) => marque.id === modele.marqueId)}/>
+      <TableModelesLigne key={modele.id} modele={modele}/>
     ))}
   </IndexTable>
 );
 
-const TableModelesLigne = ({ modele, marque }) => (
+const TableModelesLigne = ({ modele }) => (
   <IndexTable.Row id={modele.id} position={modele.id}>
     <IndexTable.Cell>
       {modele.marqueDeleted ? (
@@ -67,8 +66,11 @@ const TableModelesLigne = ({ modele, marque }) => (
           </Text>
         </InlineStack>
       ) : (
-        marque.name + ' ' + modele.name
+        modele.marque.name + ' ' + modele.name
       )}
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {modele.produits ? modele.produits.length : 0}
     </IndexTable.Cell>
     <IndexTable.Cell>
       <Link to={`/app/modeles/${modele.id}`}>Modifier</Link>
@@ -77,7 +79,7 @@ const TableModelesLigne = ({ modele, marque }) => (
 );
 
 export default function Index() {
-  const { modeles, marques } = useLoaderData();
+  const { modeles } = useLoaderData();
   const navigate = useNavigate();
 
   return (
@@ -96,7 +98,7 @@ export default function Index() {
             {modeles.length === 0 ? (
               <AucunModele onAction={() => navigate("/app/modeles/new")} />
             ) : (
-              <TableModeles modeles={modeles} marques={marques} />
+              <TableModeles modeles={modeles} />
             )}
           </Card>
         </Layout.Section>

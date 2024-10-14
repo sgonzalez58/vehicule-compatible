@@ -1,7 +1,15 @@
 import db from "../db.server";
 
 export async function getModele(id) {
-  const modele = await db.modele.findFirst({ where: { id } });
+  const modele = await db.modele.findUnique({ 
+    where: {
+      id: id
+    },
+    include: {
+      marque: true,
+      produits: true
+    }
+});
 
   if (!modele) {
     return null;
@@ -13,11 +21,49 @@ export async function getModele(id) {
 export async function getModeles() {
   const modeles = await db.modele.findMany({
     orderBy: { id: "desc" },
+    include: { marque: true, produits: true }
   });
 
   if (modeles.length === 0) return [];
 
   return modeles;
+}
+
+export async function updateModele(id, data){
+  if(data.produitId){
+    return await db.modele.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        produits: {
+          connect: { id: Number(data.produitId) }
+        },
+      }
+    }))
+  }
+  if(data.deleteProduitId){
+    return await db.modele.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        produits: {
+          disconnect: { id: Number(data.deleteProduitId) }
+        },
+      }
+    }))
+  }
+  return await db.modele.update(({
+    where: {
+      id: id,
+    },
+    data: {
+      name: data.name,
+      marqueId: data.marque,
+      productImage: data.productImage
+    },
+  }))
 }
 
 export function validateModele(data) {
