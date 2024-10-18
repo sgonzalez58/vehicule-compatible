@@ -30,9 +30,10 @@ import { getMarques } from "../models/marque.server";
 import { getModele, updateModele, validateModele } from "../models/modele.server";
 
 import { getProduits } from "../models/produit.server";
+import { authenticate } from "../shopify.server";
 
 export async function loader({ params }) {
-
+  await authenticate.admin(request);
   if (params.id === "new") {
     return json({
       modele: { destination : "modele", name: "", marqueId: null },
@@ -292,7 +293,7 @@ export default function modeleForm() {
                 <Button variant="tertiary" onClick={()=> navigate("/app/marques/new")} >Je ne trouve pas la marque.</Button>
               </BlockStack>
             </Card>
-            {formState.id ? (
+            {modele.id ? (
               <Card padding="0">
               {modele.produits.length === 0 ? (
                 <AucunProduit onAction={() => navigate( "/app/produits/new" )}/>

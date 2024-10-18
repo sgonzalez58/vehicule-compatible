@@ -1,0 +1,14 @@
+.compatibilite-vehicule-wrapper{
+  display: flex;
+  margin:auto;
+  align-items: center;
+  flex-direction: column;
+  gap:20px;
+  font-size: 1.4em;
+}
+
+.compatibilite-vehicule-wrapper form{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}

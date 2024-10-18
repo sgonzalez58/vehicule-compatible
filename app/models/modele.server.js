@@ -29,6 +29,17 @@ export async function getModeles() {
   return modeles;
 }
 
+export async function getVehicules() {
+  const modeles = await db.modele.findMany({
+    orderBy: { id: "desc" },
+    include: { marque: true }
+  });
+
+  if (modeles.length === 0) return [];
+
+  return modeles;
+}
+
 export async function updateModele(id, data){
   if(data.produitId){
     return await db.modele.update(({

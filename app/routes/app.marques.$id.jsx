@@ -19,9 +19,10 @@ import {
 
 import db from "../db.server";
 import { getMarque, validateMarque } from "../models/marque.server";
+import { authenticate } from "../shopify.server";
 
 export async function loader({ request, params }) {
-
+  await authenticate.admin(request);
   if (params.id === "new") {
     return json({
       destination: "marque",

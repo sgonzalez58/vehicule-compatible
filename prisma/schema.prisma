@@ -31,6 +31,13 @@ model Session {
   emailVerified Boolean?  @default(false)
 }
 
+model Page {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  idShopify     String
+  url           String
+}
+
 model Marque {
   id            Int       @id @default(autoincrement())
   modeles       Modele[]

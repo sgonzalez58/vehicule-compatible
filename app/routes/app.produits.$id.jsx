@@ -27,8 +27,10 @@ import db from "../db.server";
 
 import { getModeles } from "../models/modele.server";
 import { getProduit, updateProduit, validateProduit } from "../models/produit.server";
-export async function loader({ params }) {
+import { authenticate } from "../shopify.server";
 
+export async function loader({ params }) {
+  await authenticate.admin(request);
   if (params.id === "new") {
     return json({
       produit: { destination : "produit", productId: null, productName: "", productImage: "", modeles: []},
@@ -292,7 +294,7 @@ export default function modeleForm() {
                 )}
               </BlockStack>
             </Card>
-            {formState.id ? (
+            {produit.id ? (
               <Card padding="0">
               {produit.modeles.length === 0 ?
                 modeles.length === 0 ?
