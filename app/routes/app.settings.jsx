@@ -1,4 +1,4 @@
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 
 import { getPage } from "../models/page.server";
@@ -23,12 +23,13 @@ export const action = async ({request}) => {
 
   if(data.name){
     const response = await admin.graphql(
-      `mutation pageCreate($input: PageInput!) {
-        pageCreate(input: $input) {
+      `#graphql
+      mutation CreatePage($page: PageCreateInput!) {
+        pageCreate(page: $page) {
           page {
-            body
-            handle
+            id
             title
+            handle
           }
           userErrors {
             field
@@ -37,11 +38,13 @@ export const action = async ({request}) => {
         }
       }`,
       {
-        "input": {
-          title: "<"+data.name+">",
-          body: "[compatibilite_vehicule]",
-          published: true
-      }}
+        variables : {
+          "page": {
+            "title": data.name,
+            "body": "[compatibilite_vehicule]"
+          }
+        }
+      }
     );
     let responseJson = await response.json();
     console.log(responseJson.data);

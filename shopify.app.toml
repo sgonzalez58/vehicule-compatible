@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://thereof-fetish-later-requesting.trycloudflare.com"
+application_url = "https://florists-coleman-layer-stats.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,13 +17,13 @@ scopes = "read_products,write_content"
 
 [auth]
 redirect_urls = [
-  "https://thereof-fetish-later-requesting.trycloudflare.com/auth/callback",
-  "https://thereof-fetish-later-requesting.trycloudflare.com/auth/shopify/callback",
-  "https://thereof-fetish-later-requesting.trycloudflare.com/api/auth/callback"
+  "https://florists-coleman-layer-stats.trycloudflare.com/auth/callback",
+  "https://florists-coleman-layer-stats.trycloudflare.com/auth/shopify/callback",
+  "https://florists-coleman-layer-stats.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
-api_version = "2024-07"
+api_version = "2024-10"
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers/data_request"
@@ -42,7 +42,7 @@ api_version = "2024-07"
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://thereof-fetish-later-requesting.trycloudflare.com/app/api"
+url = "https://florists-coleman-layer-stats.trycloudflare.com/app/api"
 subpath = "vehicule-compatible"
 prefix = "apps"
 
