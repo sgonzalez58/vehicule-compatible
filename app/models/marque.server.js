@@ -13,6 +13,7 @@ export async function getMarque(id) {
 export async function getMarques() {
   const marques = await db.marque.findMany({
     orderBy: { id: "desc" },
+    include: { modeles : true }
   });
 
   if (marques.length === 0) return [];

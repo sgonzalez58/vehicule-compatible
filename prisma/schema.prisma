@@ -46,10 +46,11 @@ model Marque {
 
 model Modele {
   id            Int       @id @default(autoincrement())
-  name          String    @unique
+  name          String    
   marque        Marque    @relation(fields: [marqueId], references: [id])
   marqueId      Int
   produits      Produit[]
+  @@unique([name, marqueId])
 }
 
 model Produit {
@@ -57,5 +58,7 @@ model Produit {
   productId     String    @unique
   productName   String
   productImage  String
+  productUrl    String
+  productPrice  Decimal   @default(0)
   modeles       Modele[]
 }

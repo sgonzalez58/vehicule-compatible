@@ -20,33 +20,40 @@ import {
   Thumbnail,
   EmptyState,
   IndexTable,
-  Link,
 } from "@shopify/polaris";
 
 import db from "../db.server";
 
+import { getMarques } from "../models/marque.server";
 import { getModeles } from "../models/modele.server";
 import { getProduit, updateProduit, validateProduit } from "../models/produit.server";
 import { authenticate } from "../shopify.server";
 
-export async function loader({ params }) {
-  await authenticate.admin(request);
+export async function loader({ params, request }) {
+  const { session } = await authenticate.admin(request);
   if (params.id === "new") {
     return json({
-      produit: { destination : "produit", productId: null, productName: "", productImage: "", modeles: []},
-      modeles: await getModeles()
+      produit: { destination : "produit", productId: null, productName: "", productImage: "", productUrl: "", productPrice: 0, modeles: []},
+      modeles: await getModeles(),
+      session,
+      marques : await getMarques()
     });
   }
+  const marques = await getMarques();
   const modeles = await getModeles();
   const produit = await getProduit(Number(params.id))
 
   return json({
     produit,
-    modeles
+    modeles,
+    session,
+    marques
   });
 }
 
 export async function action({ request, params }) {
+
+  const { admin } = await authenticate.admin(request);
 
   /** @type {any} */
   const data = {
@@ -75,10 +82,12 @@ export async function action({ request, params }) {
 export default function modeleForm() {
   const errors = useActionData()?.errors || {};
 
-  const { produit = {}, modeles = []} = useLoaderData();
+  const { produit = {}, modeles = [], session, marques = [] } = useLoaderData();
   const [formState, setFormState] = useState(produit || {});
   const [cleanFormState, setCleanFormState] = useState(produit || {});
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
+
+  const shop = session.shop;
 
   const nav = useNavigation();
   const isSaving =
@@ -95,13 +104,23 @@ export default function modeleForm() {
     });
 
     if (products) {
-      const { images, id, title } = products[0];
+      const { images, id, title, handle, variants } = products[0];
+
+      let minimum_price = variants[0].price;
+
+      for (const variant in variants){
+        if (variant.price < minimum_price){
+          minimum_price = variant.price;
+        }
+      }
       
       setFormState({
         ...formState,
         productId: id,
         productName: title,
         productImage: images[0]?.originalSrc,
+        productUrl: "/products/" + handle,
+        productPrice: minimum_price
       })
     }
   }
@@ -111,6 +130,8 @@ export default function modeleForm() {
       productId: formState.productId,
       productName: formState.productName,
       productImage: formState.productImage,
+      productUrl: formState.productUrl,
+      productPrice: formState.productPrice,
       modeleId: Number(selectedModeleId)
     };
     
@@ -123,6 +144,8 @@ export default function modeleForm() {
       productId: formState.productId,
       productName: formState.productName,
       productImage: formState.productImage,
+      productUrl: formState.productUrl,
+      productPrice: formState.productPrice,
       deleteModeleId: Number(modeleId)
     };
     
@@ -240,7 +263,9 @@ export default function modeleForm() {
     let data = {
       productId: formState.productId,
       productName: formState.productName,
-      productImage: formState.productImage
+      productImage: formState.productImage,
+      productUrl: formState.productUrl,
+      productPrice: formState.productPrice,
     };
     
     setCleanFormState({ ...formState });

@@ -60,7 +60,9 @@ export async function updateProduit(id, data){
     data: {
       productId: data.productId,
       productName: data.productName,
-      productImage: data.productImage
+      productImage: data.productImage,
+      productUrl: data.productUrl,
+      productPrice: data.productPrice
     },
   }))
 }

@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://florists-coleman-layer-stats.trycloudflare.com"
+application_url = "https://driven-filled-checklist-apart.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,32 +17,125 @@ scopes = "read_products,write_content"
 
 [auth]
 redirect_urls = [
-  "https://florists-coleman-layer-stats.trycloudflare.com/auth/callback",
-  "https://florists-coleman-layer-stats.trycloudflare.com/auth/shopify/callback",
-  "https://florists-coleman-layer-stats.trycloudflare.com/api/auth/callback"
+  "https://enhanced-of-abstracts-width.trycloudflare.com/auth/callback",
+  "https://enhanced-of-abstracts-width.trycloudflare.com/auth/shopify/callback",
+  "https://enhanced-of-abstracts-width.trycloudflare.com/api/auth/callback",
+  "https://ohio-view-months-helped.trycloudflare.com/auth/callback",
+  "https://ohio-view-months-helped.trycloudflare.com/auth/shopify/callback",
+  "https://ohio-view-months-helped.trycloudflare.com/api/auth/callback",
+  "https://said-worthy-hung-revenues.trycloudflare.com/auth/callback",
+  "https://said-worthy-hung-revenues.trycloudflare.com/auth/shopify/callback",
+  "https://said-worthy-hung-revenues.trycloudflare.com/api/auth/callback",
+  "https://lives-boy-seven-scanner.trycloudflare.com/auth/callback",
+  "https://lives-boy-seven-scanner.trycloudflare.com/auth/shopify/callback",
+  "https://lives-boy-seven-scanner.trycloudflare.com/api/auth/callback",
+  "https://lyrics-kijiji-stronger-situated.trycloudflare.com/auth/callback",
+  "https://lyrics-kijiji-stronger-situated.trycloudflare.com/auth/shopify/callback",
+  "https://lyrics-kijiji-stronger-situated.trycloudflare.com/api/auth/callback",
+  "https://fuel-bestsellers-twisted-occurrence.trycloudflare.com/auth/callback",
+  "https://fuel-bestsellers-twisted-occurrence.trycloudflare.com/auth/shopify/callback",
+  "https://fuel-bestsellers-twisted-occurrence.trycloudflare.com/api/auth/callback",
+  "https://pearl-generate-research-kong.trycloudflare.com/auth/callback",
+  "https://pearl-generate-research-kong.trycloudflare.com/auth/shopify/callback",
+  "https://pearl-generate-research-kong.trycloudflare.com/api/auth/callback",
+  "https://commented-disclosure-rna-sleeping.trycloudflare.com/auth/callback",
+  "https://commented-disclosure-rna-sleeping.trycloudflare.com/auth/shopify/callback",
+  "https://commented-disclosure-rna-sleeping.trycloudflare.com/api/auth/callback",
+  "https://laugh-variables-karl-disclaimer.trycloudflare.com/auth/callback",
+  "https://laugh-variables-karl-disclaimer.trycloudflare.com/auth/shopify/callback",
+  "https://laugh-variables-karl-disclaimer.trycloudflare.com/api/auth/callback",
+  "https://lady-left-disclaimers-diego.trycloudflare.com/auth/callback",
+  "https://lady-left-disclaimers-diego.trycloudflare.com/auth/shopify/callback",
+  "https://lady-left-disclaimers-diego.trycloudflare.com/api/auth/callback",
+  "https://babies-offense-quad-steve.trycloudflare.com/auth/callback",
+  "https://babies-offense-quad-steve.trycloudflare.com/auth/shopify/callback",
+  "https://babies-offense-quad-steve.trycloudflare.com/api/auth/callback",
+  "https://undergraduate-scientific-betting-pill.trycloudflare.com/auth/callback",
+  "https://undergraduate-scientific-betting-pill.trycloudflare.com/auth/shopify/callback",
+  "https://undergraduate-scientific-betting-pill.trycloudflare.com/api/auth/callback",
+  "https://pro-transactions-temporarily-ra.trycloudflare.com/auth/callback",
+  "https://pro-transactions-temporarily-ra.trycloudflare.com/auth/shopify/callback",
+  "https://pro-transactions-temporarily-ra.trycloudflare.com/api/auth/callback",
+  "https://motors-peter-blake-chest.trycloudflare.com/auth/callback",
+  "https://motors-peter-blake-chest.trycloudflare.com/auth/shopify/callback",
+  "https://motors-peter-blake-chest.trycloudflare.com/api/auth/callback",
+  "https://rescue-proposition-llc-modifications.trycloudflare.com/auth/callback",
+  "https://rescue-proposition-llc-modifications.trycloudflare.com/auth/shopify/callback",
+  "https://rescue-proposition-llc-modifications.trycloudflare.com/api/auth/callback",
+  "https://drums-unified-helen-supplies.trycloudflare.com/auth/callback",
+  "https://drums-unified-helen-supplies.trycloudflare.com/auth/shopify/callback",
+  "https://drums-unified-helen-supplies.trycloudflare.com/api/auth/callback",
+  "https://hayes-chapter-tahoe-kentucky.trycloudflare.com/auth/callback",
+  "https://hayes-chapter-tahoe-kentucky.trycloudflare.com/auth/shopify/callback",
+  "https://hayes-chapter-tahoe-kentucky.trycloudflare.com/api/auth/callback",
+  "https://purple-equivalent-voting-bruce.trycloudflare.com/auth/callback",
+  "https://purple-equivalent-voting-bruce.trycloudflare.com/auth/shopify/callback",
+  "https://purple-equivalent-voting-bruce.trycloudflare.com/api/auth/callback",
+  "https://leone-various-meaningful-depression.trycloudflare.com/auth/callback",
+  "https://leone-various-meaningful-depression.trycloudflare.com/auth/shopify/callback",
+  "https://leone-various-meaningful-depression.trycloudflare.com/api/auth/callback",
+  "https://javascript-harassment-raid-envelope.trycloudflare.com/auth/callback",
+  "https://javascript-harassment-raid-envelope.trycloudflare.com/auth/shopify/callback",
+  "https://javascript-harassment-raid-envelope.trycloudflare.com/api/auth/callback",
+  "https://pulled-determines-concord-dame.trycloudflare.com/auth/callback",
+  "https://pulled-determines-concord-dame.trycloudflare.com/auth/shopify/callback",
+  "https://pulled-determines-concord-dame.trycloudflare.com/api/auth/callback",
+  "https://pure-cl-added-edges.trycloudflare.com/auth/callback",
+  "https://pure-cl-added-edges.trycloudflare.com/auth/shopify/callback",
+  "https://pure-cl-added-edges.trycloudflare.com/api/auth/callback",
+  "https://diamond-exceed-ensemble-consequence.trycloudflare.com/auth/callback",
+  "https://diamond-exceed-ensemble-consequence.trycloudflare.com/auth/shopify/callback",
+  "https://diamond-exceed-ensemble-consequence.trycloudflare.com/api/auth/callback",
+  "https://confidentiality-rides-kelkoo-info.trycloudflare.com/auth/callback",
+  "https://confidentiality-rides-kelkoo-info.trycloudflare.com/auth/shopify/callback",
+  "https://confidentiality-rides-kelkoo-info.trycloudflare.com/api/auth/callback",
+  "https://against-blow-images-dont.trycloudflare.com/auth/callback",
+  "https://against-blow-images-dont.trycloudflare.com/auth/shopify/callback",
+  "https://against-blow-images-dont.trycloudflare.com/api/auth/callback",
+  "https://hats-leaving-great-resistance.trycloudflare.com/auth/callback",
+  "https://hats-leaving-great-resistance.trycloudflare.com/auth/shopify/callback",
+  "https://hats-leaving-great-resistance.trycloudflare.com/api/auth/callback",
+  "https://careers-portal-omissions-citation.trycloudflare.com/auth/callback",
+  "https://careers-portal-omissions-citation.trycloudflare.com/auth/shopify/callback",
+  "https://careers-portal-omissions-citation.trycloudflare.com/api/auth/callback",
+  "https://hall-bingo-prompt-inline.trycloudflare.com/auth/callback",
+  "https://hall-bingo-prompt-inline.trycloudflare.com/auth/shopify/callback",
+  "https://hall-bingo-prompt-inline.trycloudflare.com/api/auth/callback",
+  "https://choose-phones-letter-mar.trycloudflare.com/auth/callback",
+  "https://choose-phones-letter-mar.trycloudflare.com/auth/shopify/callback",
+  "https://choose-phones-letter-mar.trycloudflare.com/api/auth/callback",
+  "https://months-highlights-supposed-travelers.trycloudflare.com/auth/callback",
+  "https://months-highlights-supposed-travelers.trycloudflare.com/auth/shopify/callback",
+  "https://months-highlights-supposed-travelers.trycloudflare.com/api/auth/callback",
+  "https://database-accurate-operated-dept.trycloudflare.com/auth/callback",
+  "https://database-accurate-operated-dept.trycloudflare.com/auth/shopify/callback",
+  "https://database-accurate-operated-dept.trycloudflare.com/api/auth/callback",
+  "https://driven-filled-checklist-apart.trycloudflare.com/auth/callback",
+  "https://driven-filled-checklist-apart.trycloudflare.com/auth/shopify/callback",
+  "https://driven-filled-checklist-apart.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
 api_version = "2024-10"
 
   [[webhooks.subscriptions]]
-  uri = "/webhooks/customers/data_request"
   compliance_topics = [ "customers/data_request" ]
+  uri = "/webhooks/customers/data_request"
 
   [[webhooks.subscriptions]]
-  uri = "/webhooks/customers/redact"
   compliance_topics = [ "customers/redact" ]
+  uri = "/webhooks/customers/redact"
 
   [[webhooks.subscriptions]]
-  uri = "/webhooks/shop/redact"
   compliance_topics = [ "shop/redact" ]
+  uri = "/webhooks/shop/redact"
 
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://florists-coleman-layer-stats.trycloudflare.com/app/api"
+url = "https://driven-filled-checklist-apart.trycloudflare.com/app/api"
 subpath = "vehicule-compatible"
 prefix = "apps"
 

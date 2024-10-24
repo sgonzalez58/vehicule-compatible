@@ -32,7 +32,7 @@ import { getModele, updateModele, validateModele } from "../models/modele.server
 import { getProduits } from "../models/produit.server";
 import { authenticate } from "../shopify.server";
 
-export async function loader({ params }) {
+export async function loader({ params, request }) {
   await authenticate.admin(request);
   if (params.id === "new") {
     return json({

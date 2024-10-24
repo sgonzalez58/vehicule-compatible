@@ -10,14 +10,41 @@ export async function getPage() {
   return page;
 }
 
-export function validateProduit(data) {
+export async function pageUpdate(page, data, admin){
+  await admin.graphql(
+    `#graphql
+    mutation pageDelete($id: ID!) {
+    pageDelete(id: $id) {
+      deletedPageId
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+    {
+      variables : {
+        "id": page.idShopify
+      }
+    }
+  )
+  const newPage = await db.page.update({where: { id: Number(page.id) }, data});
+
+  if(!newPage){
+    return null;
+  }
+
+  return newPage;
+}
+
+export function validatePage(data) {
   const errors = {};
 
   if (!data.name) {
     errors.nom = "Vous devez indiquer le nom de la page.";
   }
 
-  if (!data.pageId) {
+  if (!data.idShopify) {
     errors.pageId = "Erreur lors de la récupération de la page Shopify.";
   }
 

@@ -1,8 +1,8 @@
 <script src="{{'./vehicule-compatible.js'|asset_url}}" defer="defer"></script> 
 {{ 'vehicule-compatible.css'|asset_url|stylesheet_tag}} 
 <div class="compatibilite-vehicule-wrapper">
-    <h2>{{ 'compatibilite_vehicule.label' | t }}</h2>
-    <form id="vehicule-compatible-form" method="POST" action="/pages/compatibilite-vehicule">
+    <h2>Vérifiez la compatibilité du véhicule</h2>
+    <form id="vehicule-compatible-form" method="GET">
         <select id="vehicule-compatible-marque"></select>
         <select id="vehicule-compatible-modele" name="vehicule" required disabled></select>
     <input type="submit" value="recherche">

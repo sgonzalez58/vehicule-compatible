@@ -28,6 +28,12 @@ const response = fetch("/apps/vehicule-compatible", {
 
 function recupererModeles(obj){
   let modeles_recup = obj.modeles;
+  if(obj.message){
+    form.innerText = obj.message;
+    form.setAttribute('style', 'color:red');
+    return;
+  }
+  form.setAttribute('action', obj.appPage)
   if(select_marque.children.length == 0){
     let option = document.createElement("option");
     option.innerText = "Marque";

@@ -1,14 +1,30 @@
 .compatibilite-vehicule-wrapper{
-  display: flex;
+  max-width:800px;
+  background-color: #f4f4f4;
   margin:auto;
-  align-items: center;
-  flex-direction: column;
-  gap:20px;
-  font-size: 1.4em;
+  padding: 30px;
+  border-radius:20px;
+  border:1px solid #242424;
 }
-
+.compatibilite-vehicule-wrapper h2{
+  text-align:center;
+}
 .compatibilite-vehicule-wrapper form{
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  display:flex;
+  justify-content:space-between;
+  padding:20px;
 }
+.compatibilite-vehicule-wrapper form select{
+  font-size:18px;
+  padding: 18px 4px;
+  border-radius: 5px;
+  border: 1px solid #242424;
+  width: 30%;
+}
+.compatibilite-vehicule-wrapper form input{
+  font-size:18px;
+  padding: 18px 4px;
+  border-radius: 5px;
+  border: 1px solid #242424;
+  width: 35%;
+}s
