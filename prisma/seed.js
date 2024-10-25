@@ -781,7 +781,7 @@ async function main() {
         "Volkswagen Caddy",
         "Volkswagen Caddy V",
         "Volkswagen Coccinelle",
-        "Volkswagen crafter",
+        "Volkswagen Crafter",
         "Volkswagen Fox",
         "Volkswagen Golf",
         "Volkswagen Golf III",

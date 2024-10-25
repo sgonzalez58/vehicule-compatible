@@ -21,6 +21,18 @@ export async function getMarques() {
   return marques;
 }
 
+export async function getMarquesForPagination(page) {
+  const marques = await db.marque.findMany({
+    orderBy: { name: "asc" },
+    take: 10,
+    skip: 10*(page-1)
+  });
+
+  if (marques.length === 0) return [];
+
+  return marques;
+}
+
 export function validateMarque(data) {
   const errors = {};
 

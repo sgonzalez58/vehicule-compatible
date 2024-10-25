@@ -29,6 +29,19 @@ export async function getModeles() {
   return modeles;
 }
 
+export async function getModelesForPagination(page) {
+  const modeles = await db.modele.findMany({
+    orderBy: [{ marque : { name : "asc"}}, { name : "asc" }],
+    include: { marque: true, produits: true },
+    take: 10,
+    skip: 10*(page-1)
+  });
+
+  if (modeles.length === 0) return [];
+
+  return modeles;
+}
+
 export async function getVehicules() {
   const modeles = await db.modele.findMany({
     orderBy: { id: "desc" },
