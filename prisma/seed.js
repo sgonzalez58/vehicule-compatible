@@ -852,7 +852,7 @@ async function main() {
         let marqueId = null;
         let modeleWithoutMarque = modele;
         for (const marque of marques){
-            if(modele.match(marque)){
+            if(modele.startsWith(marque)){
                 marqueId = marquesWithId[marque];
                 modeleWithoutMarque = modeleWithoutMarque.replace(marque + ' ', '');
             }

@@ -3,41 +3,30 @@ import { useLoaderData, useNavigate } from "@remix-run/react";
 import {
   BlockStack,
   Card,
+  ChoiceList,
   EmptyState,
   IndexFilters,
+  IndexFiltersMode,
   IndexTable,
   Layout,
   Link,
   Page,
   Text,
-  TextField,
+  useSetIndexFiltersMode,
 } from "@shopify/polaris";
-import { getModeles, getModelesForPagination } from "../models/modele.server";
+import { getModeles } from "../models/modele.server";
 import { authenticate } from "../shopify.server";
-import { getMarque, getMarques, getMarquesForPagination } from "../models/marque.server";
+import { getMarques } from "../models/marque.server";
+import { useCallback, useState } from "react";
 
 
 export async function loader({ request }) {
   await authenticate.admin(request);
-  const url = new URL(request.url);
-  const pageModele = url.searchParams.get("pageModele") ? Number(url.searchParams.get("pageModele")) : 1;
-  const pageMarque = url.searchParams.get("pageMarque") ? Number(url.searchParams.get("pageMarque")) : 1;
-  let marqueModele = url.searchParams.get("marqueModele") ? Number(url.searchParams.get("marqueModele")) : null;
-  if(marqueModele){
-    marqueModele = await getMarque(Number(marqueModele));
-  }
-  const modelesTotal = (await getModeles()).length;
-  const marquesTotal = (await getMarques()).length;
-  const modeles = await getModelesForPagination(pageModele);
-  const marques = await getMarquesForPagination(pageMarque);
+  const modeles = await getModeles();
+  const marques = await getMarques();
   return json({
     modeles,
-    marques,
-    pageMarque,
-    pageModele,
-    marquesTotal,
-    modelesTotal,
-    marqueModele
+    marques
   });
 }
 
@@ -100,7 +89,7 @@ const TableModelesLigne = ({ modele }) => (
       {modele.produits ? modele.produits.length : 0}
     </IndexTable.Cell>
     <IndexTable.Cell>
-      <Link to={`/app/modeles/${modele.id}`}>Modifier</Link>
+      <Link url={`/app/modeles/${modele.id}`}>Modifier</Link>
     </IndexTable.Cell>
   </IndexTable.Row>
 );
@@ -153,166 +142,241 @@ const TableMarquesLigne = ({ marque }) => (
       {marque.modeles ? marque.modeles.length : 0}
     </IndexTable.Cell>
     <IndexTable.Cell>
-      <Link to={`/app/marques/${marque.id}`}>Modifier</Link>
+      <Link url={`/app/marques/${marque.id}`}>Modifier</Link>
     </IndexTable.Cell>
   </IndexTable.Row>
 );
 
 export default function Index() {
-  const { modeles, marques, pageMarque, pageModele, marquesTotal, modelesTotal, marqueModele } = useLoaderData();
+  const { modeles, marques } = useLoaderData();
   const navigate = useNavigate();
 
-  const sleep = (ms) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-  const [itemStrings, setItemStrings] = useState([
-    'All',
-    'Unpaid',
-    'Open',
-    'Closed',
-    'Local delivery',
-    'Local pickup',
+  const [pageMarques, setPageMarques] = useState(1);
+  const [marquesTableau, setMarquesTableau] = useState(marques.slice(0, 9));
+  const [marquesTableauComplet, setMarquesTableauComplet] = useState(marques);
+  const [nombreMarquesTableau, setNombreMarquesTableau] = useState(marques.length);
+  const [nextPageMarques, setNextPageMarques] = useState(marquesTableau.length < nombreMarquesTableau);
+  const [previousPageMarques, setPreviousPageMarques] = useState(pageMarques != 1);
+
+  const [pageModeles, setPageModeles] = useState(1);
+  const [modelesTableau, setModelesTableau] = useState(modeles.slice(0, 9));
+  const [modelesTableauComplet, setModelesTableauComplet] = useState(modeles);
+  const [nombreModelesTableau, setNombreModelesTableau] = useState(modeles.length);
+  const [nextPageModeles, setNextPageModeles] = useState(modelesTableau.length < nombreModelesTableau);
+  const [previousPageModeles, setPreviousPageModeles] = useState(pageModeles != 1);
+
+  const [itemStrings, setItemsStrings] = useState([
+    'All'
   ]);
-  const deleteView = (index) => {
-    const newItemStrings = [...itemStrings];
-    newItemStrings.splice(index, 1);
-    setItemStrings(newItemStrings);
-    setSelected(0);
-  };
 
-  const duplicateView = async (name) => {
-    setItemStrings([...itemStrings, name]);
-    setSelected(itemStrings.length);
-    await sleep(1);
-    return true;
-  };
 
-  const tabs = itemStrings.map((item, index) => ({
+  const tabsModeles = itemStrings.map((item, index) => ({
     content: item,
     index,
-    onAction: () => {},
-    id: `${item}-${index}`,
+    id: `${item}-modele-${index}`,
     isLocked: index === 0,
-    actions:
-      index === 0
-        ? []
-        : [
-            {
-              type: 'rename',
-              onAction: () => {},
-              onPrimaryAction: async (value) => {
-                const newItemsStrings = tabs.map((item, idx) => {
-                  if (idx === index) {
-                    return value;
-                  }
-                  return item.content;
-                });
-                await sleep(1);
-                setItemStrings(newItemsStrings);
-                return true;
-              },
-            },
-            {
-              type: 'duplicate',
-              onPrimaryAction: async (value) => {
-                await sleep(1);
-                duplicateView(value);
-                return true;
-              },
-            },
-            {
-              type: 'edit',
-            },
-            {
-              type: 'delete',
-              onPrimaryAction: async () => {
-                await sleep(1);
-                deleteView(index);
-                return true;
-              },
-            },
-          ],
   }));
-  const [selected, setSelected] = useState(0);
-  const onCreateNewView = async (value: string) => {
-    await sleep(500);
-    setItemStrings([...itemStrings, value]);
-    setSelected(itemStrings.length);
-    return true;
-  };
-  const sortOptions: IndexFiltersProps['sortOptions'] = [
-    {label: 'Order', value: 'order asc', directionLabel: 'Ascending'},
-    {label: 'Order', value: 'order desc', directionLabel: 'Descending'},
-    {label: 'Customer', value: 'customer asc', directionLabel: 'A-Z'},
-    {label: 'Customer', value: 'customer desc', directionLabel: 'Z-A'},
-    {label: 'Date', value: 'date asc', directionLabel: 'A-Z'},
-    {label: 'Date', value: 'date desc', directionLabel: 'Z-A'},
-    {label: 'Total', value: 'total asc', directionLabel: 'Ascending'},
-    {label: 'Total', value: 'total desc', directionLabel: 'Descending'},
-  ];
-  const [sortSelected, setSortSelected] = useState(['order asc']);
+
+  const [selectedModeles, setSelectedModeles] = useState(0);
   const {mode, setMode} = useSetIndexFiltersMode(IndexFiltersMode.Filtering);
-  const onHandleCancel = () => {};
+  const [filtreMarque, setFiltreMarque] = useState([]);
 
-  const onHandleSave = async () => {
-    await sleep(1);
-    return true;
-  };
+  const [queryValueModeles, setQueryValueModeles] = useState("");
 
-  const primaryAction: IndexFiltersProps['primaryAction'] =
-    selected === 0
-      ? {
-          type: 'save-as',
-          onAction: onCreateNewView,
-          disabled: false,
-          loading: false,
-        }
-      : {
-          type: 'save',
-          onAction: onHandleSave,
-          disabled: false,
-          loading: false,
-        };
-  const [accountStatus, setAccountStatus] = useState<string[]>([]);
-  const [moneySpent, setMoneySpent] = useState<[number, number] | undefined>(
-    undefined,
-  );
-  const [taggedWith, setTaggedWith] = useState<string | undefined>('');
-  const [queryValue, setQueryValue] = useState<string | undefined>(undefined);
-
-  const handleAccountStatusChange = useCallback(
-    (value: string[]) => setAccountStatus(value),
-    [],
-  );
-  const handleMoneySpentChange = useCallback(
-    (value: [number, number]) => setMoneySpent(value),
-    [],
-  );
-  const handleTaggedWithChange = useCallback(
-    (value: string) => setTaggedWith(value),
-    [],
-  );
-  const handleQueryValueChange = useCallback(
-    (value: string) => setQueryValue(value),
-    [],
-  );
-  const handleAccountStatusRemove = useCallback(() => setAccountStatus([]), []);
-  const handleMoneySpentRemove = useCallback(
-    () => setMoneySpent(undefined),
-    [],
-  );
-  const handleTaggedWithRemove = useCallback(() => setTaggedWith(''), []);
-  const handleQueryValueRemove = useCallback(() => setQueryValue(''), []);
-  const handleFiltersClearAll = useCallback(() => {
-    handleAccountStatusRemove();
-    handleMoneySpentRemove();
-    handleTaggedWithRemove();
-    handleQueryValueRemove();
-  }, [
-    handleQueryValueRemove,
-    handleTaggedWithRemove,
-    handleMoneySpentRemove,
-    handleAccountStatusRemove,
+  const [itemStringsMarques, setItemStringsMarques] = useState([
+    'All'
   ]);
+
+  const tabsMarques = itemStringsMarques.map((item, index) => ({
+    content: item,
+    index,
+    id: `${item}-marque-${index}`,
+    isLocked: index === 0,
+  }));
+
+  const [selectedMarques, setSelectedMarques] = useState(0);
+  const marqueMode = useSetIndexFiltersMode(IndexFiltersMode.Filtering);
+  const [modeMarque, setModeMarque] = Object.values(marqueMode);
+
+  const [queryValueMarques, setQueryValueMarques] = useState("");
+
+  const handleQueryValueMarquesChange = useCallback(
+    (value) => {
+      setQueryValueMarques(value);
+      let newMarquesArray = handleMarquesTableauUpdate(value);
+      setMarquesTableauComplet(newMarquesArray);
+      setMarquesTableau(newMarquesArray.slice(0,9))
+      setPageMarques(1);
+      setNombreMarquesTableau(newMarquesArray.length);
+      setPreviousPageMarques(false);
+      setNextPageMarques(newMarquesArray.slice(0,9).length < newMarquesArray.length);
+    }
+  );
+  const handleQueryValueMarquesRemove = useCallback(
+    () => {
+      setQueryValueMarques("");
+      setMarquesTableauComplet(marques)
+      setMarquesTableau(marques.slice(0,9))
+      setPageMarques(1);
+      setNombreMarquesTableau(marques.length)
+      setPreviousPageMarques(false)
+      setNextPageMarques(marques.slice(0,9).length < marques.length)
+    }
+  );
+
+  const handleMarquesTableauUpdate = (query) =>{
+    return (
+      query != "" ?
+        marques.filter((marque) => ((new RegExp(query, 'i')).test(marque.name)))
+        : marques
+    )
+  }
+
+  const handleNewPageMarques = useCallback(
+    (value) => {
+      setPageMarques(value);
+      setMarquesTableau(marquesTableauComplet.slice(10 * (value - 1), 9 + 10 * (value - 1)))
+      setPreviousPageMarques(value != 1);
+      setNextPageMarques(marquesTableauComplet.slice(10 * (value - 1), 9 + 10 * (value - 1)).length + 10 * (value - 1) < nombreMarquesTableau)
+    },
+    [marquesTableauComplet, nombreMarquesTableau]
+  )
+
+  const handleFiltreMarqueChange = useCallback(
+    (value) => {
+      setFiltreMarque(value);
+      let newModelesArray = handleModelesTableauUpdate(value, queryValueModeles);
+      setModelesTableauComplet(newModelesArray)
+      setModelesTableau(newModelesArray.slice(0,9))
+      setPageModeles(1);
+      setNombreModelesTableau(newModelesArray.length);
+      setPreviousPageModeles(false);
+      setNextPageModeles(newModelesArray.slice(0,9).length < newModelesArray.length);
+      },
+      [queryValueModeles]
+  );
+  const handleQueryValueModelesChange = useCallback(
+    (value) => {
+      setQueryValueModeles(value);
+      let newModelesArray = handleModelesTableauUpdate(filtreMarque, value);
+      setModelesTableauComplet(newModelesArray);
+      setModelesTableau(newModelesArray.slice(0,9))
+      setPageModeles(1);
+      setNombreModelesTableau(newModelesArray.length);
+      setPreviousPageModeles(false);
+      setNextPageModeles(newModelesArray.slice(0,9).length < newModelesArray.length);
+    },
+    [filtreMarque]
+  );
+  const handleFiltreMarqueRemove = useCallback(
+    () => {
+      setFiltreMarque([]);
+      let newModelesArray = handleModelesTableauUpdate([], queryValueModeles);
+      setModelesTableauComplet(newModelesArray);
+      setModelesTableau(newModelesArray.slice(0,9))
+      setPageModeles(1);
+      setNombreModelesTableau(newModelesArray.length)
+      setPreviousPageModeles(false)
+      setNextPageModeles(newModelesArray.slice(0,9).length < newModelesArray.length)
+    },
+    [queryValueModeles]
+  );
+  const handleQueryValueModelesRemove = useCallback(
+    () => {
+      setQueryValueModeles("");
+      let newModelesArray = handleModelesTableauUpdate(filtreMarque, "");
+      setModelesTableauComplet(newModelesArray)
+      setModelesTableau(newModelesArray.slice(0,9))
+      setPageModeles(1);
+      setNombreModelesTableau(newModelesArray.length)
+      setPreviousPageModeles(false)
+      setNextPageModeles(newModelesArray.slice(0,9).length < newModelesArray.length)
+    },
+    [filtreMarque]
+  );
+  const handleFiltersClearAll = useCallback(() => {
+    handleFiltreMarqueRemove();
+    handleQueryValueModelesRemove();
+  }, [
+    handleQueryValueModelesRemove,
+    handleFiltreMarqueRemove,
+  ]);
+
+  const handleModelesTableauUpdate = (filtreMarque, query) =>{
+    return (
+      filtreMarque.length > 0 ? 
+      (
+        query != "" ?
+        modeles.filter((modele) => filtreMarque.includes(modele.marque.name) && ((new RegExp(query, 'i')).test(modele.marque.name + ' ' + modele.name)))
+        : modeles.filter((modele) => filtreMarque.includes(modele.marque.name))
+      )
+      : (
+        query != "" ?
+          modeles.filter((modele) => ((new RegExp(query, 'i')).test(modele.marque.name + ' ' + modele.name)))
+          : modeles
+        )
+    )
+  }
+
+  const renderChoiceList = (marques) =>{
+      let choicelist = [];
+      Object.values(marques).forEach(marque => {
+        choicelist.push({"label": marque.name, "value": marque.name});
+      })
+      return choicelist;
+    }
+
+  const choiceList = renderChoiceList(marques);
+
+  const filters = [
+    {
+      key: 'marques',
+      label: 'Marques',
+      filter: (
+        <ChoiceList
+          title="Marques"
+          titleHidden
+          choices={choiceList}
+          selected={filtreMarque || []}
+          onChange={handleFiltreMarqueChange}
+          allowMultiple
+        />
+      ),
+      shortcut: true,
+    }
+  ];
+
+  const appliedFilters = [];
+  if (filtreMarque && !isEmpty(filtreMarque)) {
+    const key = 'marques';
+    appliedFilters.push({
+      key,
+      label: separerMarques(filtreMarque),
+      onRemove: handleFiltreMarqueRemove,
+    });
+  }
+
+  function separerMarques(marques){
+    return Array.from(marques).join(', ')
+  }
+
+  function isEmpty(value) {
+    if (Array.isArray(value)) {
+      return value.length === 0;
+    } else {
+      return value === '' || value == null;
+    }
+  }
+
+  const handleNewPageModeles = useCallback(
+    (value) => {
+      setPageModeles(value);
+      setModelesTableau(modelesTableauComplet.slice(10 * (value - 1), 9 + 10 * (value - 1)))
+      setPreviousPageModeles(value != 1);
+      setNextPageModeles(modelesTableauComplet.slice(10 * (value - 1), 9 + 10 * (value - 1)).length + 10 * (value - 1) < nombreModelesTableau)
+    },
+    [modelesTableauComplet, nombreModelesTableau]
+  )
 
   return (
     <Page>
@@ -334,7 +398,29 @@ export default function Index() {
               {marques.length === 0 ? (
                 <AucuneMarque onAction={() => navigate("/app/marques/new")} />
               ) : (
-                <TableMarques marques={marques} onNext={ ()=> navigate("?pageMarque=".concat(pageMarque + 1, "&pageModele=", pageModele))} onPrevious={ () => navigate("?pageMarque=".concat(pageMarque - 1, "&pageModele=", pageModele))} nextPage={(marques.length + (pageMarque - 1) * 10) != marquesTotal} previousPage={pageMarque != 1} currentPage={pageMarque} totalMarque={marquesTotal}/>
+                <Card padding={0}>
+                  <IndexFilters                    
+                    queryValue={queryValueMarques}
+                    queryPlaceholder="Rechercher dans le nom"
+                    onQueryChange={handleQueryValueMarquesChange}
+                    onQueryClear={handleQueryValueMarquesRemove}
+                    tabs={tabsMarques}
+                    selected={selectedMarques}
+                    onSelect={setSelectedMarques}
+                    filters={[]}
+                    mode={modeMarque}
+                    setMode={setModeMarque}
+                  />
+                  <TableMarques
+                    marques={marquesTableau}
+                    onNext={() => handleNewPageMarques(pageMarques + 1)}
+                    onPrevious={() => handleNewPageMarques(pageMarques - 1)}
+                    nextPage={nextPageMarques}
+                    previousPage={previousPageMarques}
+                    currentPage={pageMarques}
+                    totalMarque={nombreMarquesTableau}
+                  />
+                </Card>
               )}
             </Card>
             <Text as={"h2"} variant="headingLg">
@@ -348,24 +434,13 @@ export default function Index() {
               ) : (
                 <Card padding={0}>
                   <IndexFilters
-                    sortOptions={sortOptions}
-                    sortSelected={sortSelected}
-                    queryValue={queryValue}
-                    queryPlaceholder="Searching in all"
-                    onQueryChange={handleQueryValueChange}
-                    onQueryClear={() => setQueryValue('')}
-                    onSort={setSortSelected}
-                    primaryAction={primaryAction}
-                    cancelAction={{
-                      onAction: onHandleCancel,
-                      disabled: false,
-                      loading: false,
-                    }}
-                    tabs={tabs}
-                    selected={selected}
-                    onSelect={setSelected}
-                    canCreateNewView
-                    onCreateNewView={onCreateNewView}
+                    queryValue={queryValueModeles}
+                    queryPlaceholder="Rechercher dans le nom"
+                    onQueryChange={handleQueryValueModelesChange}
+                    onQueryClear={handleQueryValueModelesRemove}
+                    tabs={tabsModeles}
+                    selected={selectedModeles}
+                    onSelect={setSelectedModeles}
                     filters={filters}
                     appliedFilters={appliedFilters}
                     onClearAll={handleFiltersClearAll}
@@ -373,13 +448,13 @@ export default function Index() {
                     setMode={setMode}
                   />
                   <TableModeles
-                    modeles={modeles}
-                    onNext={ ()=> navigate("?pageModele=".concat(pageModele + 1, "&pageMarque=", pageMarque))}
-                    onPrevious={ () => navigate("?pageModele=".concat(pageModele - 1, "&pageMarque=", pageMarque))}
-                    nextPage={(modeles.length + (pageModele - 1) * 10) != modelesTotal}
-                    previousPage={pageModele != 1}
-                    currentPage={pageModele}
-                    totalModele={modelesTotal}
+                    modeles={modelesTableau}
+                    onNext={() => handleNewPageModeles(pageModeles + 1)}
+                    onPrevious={() => handleNewPageModeles(pageModeles - 1)}
+                    nextPage={nextPageModeles}
+                    previousPage={previousPageModeles}
+                    currentPage={pageModeles}
+                    totalModele={nombreModelesTableau}
                   />
                 </Card> 
               )}

@@ -12,20 +12,8 @@ export async function getMarque(id) {
 
 export async function getMarques() {
   const marques = await db.marque.findMany({
-    orderBy: { id: "desc" },
-    include: { modeles : true }
-  });
-
-  if (marques.length === 0) return [];
-
-  return marques;
-}
-
-export async function getMarquesForPagination(page) {
-  const marques = await db.marque.findMany({
     orderBy: { name: "asc" },
-    take: 10,
-    skip: 10*(page-1)
+    include: { modeles : true }
   });
 
   if (marques.length === 0) return [];
