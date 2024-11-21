@@ -21,35 +21,51 @@ import {
   EmptyState,
   IndexTable,
   Thumbnail,
+  ChoiceList,
 } from "@shopify/polaris";
 
 import db from "../db.server";
 
 import { getMarques } from "../models/marque.server";
 
-import { getModele, updateModele, validateModele } from "../models/modele.server";
+import { createModele, getModele, updateModele, validateModele } from "../models/modele.server";
 
 import { getProduits } from "../models/produit.server";
 import { authenticate } from "../shopify.server";
+import { getTypes } from "../models/type.server";
+import { getFamilles } from "../models/famille.server";
 
 export async function loader({ params, request }) {
   await authenticate.admin(request);
   if (params.id === "new") {
     return json({
-      modele: { destination : "modele", name: "", marqueId: null },
+      modele: { destination : "modele", name: "", marqueId: null, familleId: null, typeIds: [] },
       marques: await getMarques(),
       produits: await getProduits(),
+      types: await getTypes(),
+      familles: await getFamilles()
     });
   }
 
-  const marques = await getMarques();
-  const produits = await getProduits();
   const modele = await getModele(Number(params.id));
 
+  const modeleProduits = [];
+
+  for (const modeleType of modele.modeleTypes){
+    for (const produit of modeleType.produits){
+      if(!modeleProduits.includes(produit)){
+        modeleProduits.push(produit);
+      }
+    }
+  }
+
   return json({
-    modele,
-    marques,
-    produits
+    modele: modele,
+    marques: await getMarques(),
+    produits: await getProduits(),
+    types: await getTypes(),
+    familles: await getFamilles(),
+    modeleProduits
   });
 }
 
@@ -65,10 +81,7 @@ export async function action({ request, params }) {
     return redirect("/app/vehicule");
   }
 
-  data.marqueId = Number(data.marqueId);
-
   const errors = validateModele(data);
-
 
   if (errors) {
     return json({ errors }, { status: 422 });
@@ -76,7 +89,7 @@ export async function action({ request, params }) {
 
   const modele =
     params.id === "new"
-      ? await db.modele.create({ data })
+      ? await createModele({ data })
       : await updateModele(Number(params.id), data);
 
   return redirect(`/app/modeles/${modele.id}`);
@@ -85,7 +98,7 @@ export async function action({ request, params }) {
 export default function modeleForm() {
   const errors = useActionData()?.errors || {};
 
-  const { modele = {}, marques = [], produits = []} = useLoaderData();
+  const { modele = {}, marques = [], produits = [], types= [], familles= [], modeleProduits = []} = useLoaderData();
   const [formState, setFormState] = useState(modele || {});
   const [cleanFormState, setCleanFormState] = useState(modele || {});
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
@@ -104,10 +117,37 @@ export default function modeleForm() {
       setFormState((prevState) => ({
         ...prevState,
         marqueId: marques[0].id,
-        marqueName: marques[0].name,
       }));
     }
-  }, [marques, formState.marqueId]);
+    if (!formState.familleId && familles.length > 0) {
+      setFormState((prevState) => ({
+        ...prevState,
+        familleId: familles[0].id
+      }))
+    }
+    if(!formState.typeIds && formState.modeleTypes.length > 0){
+      setFormState((prevState) => ({
+        ...prevState,
+        typeIds : formState.modeleTypes.map((modeleType) => String(modeleType.typeId))
+      }))
+    }
+  }, [marques, familles, formState.marqueId, formState.familleId, formState.modeleTypes]);
+
+  function handleTypeChange(selectedTypeIds) {
+    setFormState({
+      ...formState,
+      typeIds: selectedTypeIds
+    })
+  }
+
+  function handleFamilleChange(selectedFamilleId) {
+    const selectedFamille = familles.find((famille) => famille.id === Number(selectedFamilleId));
+
+    setFormState({
+      ...formState,
+      familleId: selectedFamille.id,
+    });
+  }
 
   function handleMarqueChange(selectedMarqueId) {
     const selectedMarque = marques.find((marque) => marque.id === Number(selectedMarqueId));
@@ -115,7 +155,6 @@ export default function modeleForm() {
     setFormState({
       ...formState,
       marqueId: selectedMarque.id,
-      marqueName: selectedMarque.name,
     });
   }
 
@@ -239,7 +278,9 @@ export default function modeleForm() {
   function handleSave() {
     const data = {
       name: formState.name,
-      marqueId: formState.marqueId
+      marqueId: formState.marqueId,
+      typeIds: formState.typeIds,
+      familleId: formState.familleId
     };
 
     setCleanFormState({ ...formState });
@@ -287,18 +328,58 @@ export default function modeleForm() {
                     value: String(marque.id),
                   }))}
                   onChange={handleMarqueChange}
-                  value={String(formState.marqueId || "")}
+                  value={formState.marqueId || ""}
                   error={errors.marqueId}
                 />
                 <Button variant="tertiary" onClick={()=> navigate("/app/marques/new")} >Je ne trouve pas la marque.</Button>
               </BlockStack>
             </Card>
+            <Card>
+              <BlockStack gap="500">
+                <InlineStack align="space-between">
+                  <Text as={"h2"} variant="headingLg">
+                    Famille de véhicule
+                  </Text>
+                </InlineStack>
+                <Select
+                  label="Sélectionner une famille de véhicule"
+                  options={familles.map((famille) => ({
+                    label: famille.name,
+                    value: famille.id,
+                  }))}
+                  onChange={handleFamilleChange}
+                  value={(formState.familleId || "")}
+                  error={errors.familleId}
+                />
+              </BlockStack>
+            </Card>
+            <Card>
+              <BlockStack gap="500">
+                <InlineStack align="space-between">
+                  <Text as={"h2"} variant="headingLg">
+                    Type de véhicule
+                  </Text>
+                </InlineStack>
+                <ChoiceList
+                  allowMultiple
+                  title="Sélectionner un ou plusieurs types de véhicule"
+                  choices={types.map((type) => ({
+                    label: type.name,
+                    value: String(type.id),
+                    helpText: type.name == "VU" ? "Il peut s'agir d'un véhicule utilitaire." : type.name == 'VP' ? "Il peut s'agir d'un véhicule particulier." : ""
+                  }))}
+                  onChange={handleTypeChange}
+                  selected={(formState.typeIds || [])}
+                  error={errors.familleId}
+                />
+              </BlockStack>
+            </Card>
             {modele.id ? (
               <Card padding="0">
-              {modele.produits.length === 0 ? (
+              {modeleProduits.length === 0 ? (
                 <AucunProduit onAction={() => navigate( "/app/produits/new" )}/>
               ) : (
-                <TableProduits modeleProduits={modele.produits} />
+                <TableProduits modeleProduits={modeleProduits} />
               )}
             </Card>
             ) : ""

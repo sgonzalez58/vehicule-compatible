@@ -28,6 +28,7 @@ import { getMarques } from "../models/marque.server";
 import { getModeles } from "../models/modele.server";
 import { getProduit, updateProduit, validateProduit } from "../models/produit.server";
 import { authenticate } from "../shopify.server";
+import { getTypes } from "../models/type.server";
 
 export async function loader({ params, request }) {
   const { session } = await authenticate.admin(request);
@@ -36,18 +37,30 @@ export async function loader({ params, request }) {
       produit: { destination : "produit", productId: null, productName: "", productImage: "", productUrl: "", productPrice: 0, modeles: []},
       modeles: await getModeles(),
       session,
-      marques : await getMarques()
+      marques : await getMarques(),
+      types: await getTypes()
     });
   }
   const marques = await getMarques();
   const modeles = await getModeles();
   const produit = await getProduit(Number(params.id))
+  const types = await getTypes();
+
+  const produitModeles = [];
+
+  for (const modeleType of produit.modeleTypes){
+    if(!produitModeles.includes(modeleType.modele)){
+      produitModeles.push(modeleType.modele);
+    }
+  }
 
   return json({
     produit,
     modeles,
     session,
-    marques
+    marques,
+    types,
+    produitModeles
   });
 }
 
@@ -82,7 +95,7 @@ export async function action({ request, params }) {
 export default function modeleForm() {
   const errors = useActionData()?.errors || {};
 
-  const { produit = {}, modeles = [], session, marques = [] } = useLoaderData();
+  const { produit = {}, modeles = [], session, marques = [], types = [], produitModeles = [] } = useLoaderData();
   const [formState, setFormState] = useState(produit || {});
   const [cleanFormState, setCleanFormState] = useState(produit || {});
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
@@ -139,14 +152,14 @@ export default function modeleForm() {
     submit(data, { method: "post" });
   }
 
-  function supprimerProduct(modeleId) {
+  function supprimerProduct(modeleTypeId) {
     let data = {
       productId: formState.productId,
       productName: formState.productName,
       productImage: formState.productImage,
       productUrl: formState.productUrl,
       productPrice: formState.productPrice,
-      deleteModeleId: Number(modeleId)
+      deleteModeleTypeId: Number(modeleTypeId)
     };
     
     setCleanFormState({ ...formState });
@@ -222,6 +235,8 @@ export default function modeleForm() {
         itemCount={produitModeles.length}
         headings={[
           { title: "Nom" },
+          { title: "VP"},
+          { title: "VU"},
           { title: "Supprimer" },
         ]}
       >
@@ -249,7 +264,7 @@ export default function modeleForm() {
         )}
       </IndexTable.Cell>
       <IndexTable.Cell>
-        <Button tone="critical" variant="primary" onClick={() => supprimerProduct(modele.id)}>
+        <Button tone="critical" variant="primary" onClick={() => supprimerProduct(modeleTypeId)}>
           Supprimer
         </Button>
       </IndexTable.Cell>
@@ -321,7 +336,7 @@ export default function modeleForm() {
             </Card>
             {produit.id ? (
               <Card padding="0">
-              {produit.modeles.length === 0 ?
+              {produitModeles.length === 0 ?
                 modeles.length === 0 ?
                   marques.length === 0 ? 
                   ( <AucuneMarque onAction={() => navigate( "/app/marques/new" )} />)
@@ -329,10 +344,9 @@ export default function modeleForm() {
                 ( <AucuneMarque onAction={() => navigate( "/app/modeles/new" )} />)
               :
               (
-                
                 <AucunModele onAction={() => navigate( "/app/modeles/new" )}/>
               ) : (
-                <TableModeles produitModeles={produit.modeles} />
+                <TableModeles produitModeles={produitModeles} />
               )}
             </Card>
             ) : ""

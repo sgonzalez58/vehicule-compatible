@@ -6,7 +6,11 @@ export async function getProduit(id) {
       id: id
     },
     include: {
-      modeles: true
+      modeleTypes: {
+        include: {
+          modele: true
+        }
+      }
     }
   });
 
@@ -20,7 +24,7 @@ export async function getProduit(id) {
 export async function getProduits() {
   const produits = await db.produit.findMany({
     orderBy: { id: "desc" },
-    include: { modeles: true }
+    include: { modeleTypes: true }
   });
 
   if (produits.length === 0) return [];
@@ -35,20 +39,20 @@ export async function updateProduit(id, data){
         id: id,
       },
       data : {
-        modeles: {
-          connect: { id: Number(data.modeleId) }
+        modeleTypes: {
+          connect: await db.modeleType.findMany({select: { id: true}, where: {modeleId : id}})
         },
       }
     }))
   }
-  if(data.deleteModeleId){
+  if(data.deleteModeleTypeId){
     return await db.produit.update(({
       where: {
         id: id,
       },
       data : {
-        modeles: {
-          disconnect: { id: Number(data.deleteModeleId) }
+        modeleTypes: {
+          disconnect: { id: Number(data.deleteModeleTypeId) }
         },
       }
     }))

@@ -52,7 +52,8 @@ const TableModeles = ({ modeles, nextPage, previousPage, onNext, onPrevious, cur
     itemCount={modeles.length}
     headings={[
       { title: "Nom" },
-      { title: "Total produits" },
+      { title: "Total produits VP" },
+      { title: "Total produits VU" },
       { title: "Modifier" },
     ]}
     pagination={{
@@ -86,7 +87,10 @@ const TableModelesLigne = ({ modele }) => (
       )}
     </IndexTable.Cell>
     <IndexTable.Cell>
-      {modele.produits ? modele.produits.length : 0}
+      {modele.modeleTypes.filter((modeleType)=>modeleType.type.name == "VP").length > 0 ? modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].produits.length : "Na"}
+    </IndexTable.Cell>
+    <IndexTable.Cell>
+      {modele.modeleTypes.filter((modeleType)=>modeleType.type.name == "VU").length > 0 ? modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].produits.length : "Na"}
     </IndexTable.Cell>
     <IndexTable.Cell>
       <Link url={`/app/modeles/${modele.id}`}>Modifier</Link>

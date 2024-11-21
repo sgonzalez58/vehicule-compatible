@@ -7,7 +7,12 @@ export async function getModele(id) {
     },
     include: {
       marque: true,
-      produits: true
+      famille: true,
+      modeleTypes: {
+        include: {
+          produits: true
+        }
+      },
     }
 });
 
@@ -21,7 +26,7 @@ export async function getModele(id) {
 export async function getModeles() {
   const modeles = await db.modele.findMany({
     orderBy: [{ marque : { name : "asc"}}, { name : "asc" }],
-    include: { marque: true, produits: true }
+    include: { marque: true, modeleTypes: {include : { type : true, produits : true}}}
   });
 
   if (modeles.length === 0) return [];
@@ -38,6 +43,43 @@ export async function getVehicules() {
   if (modeles.length === 0) return [];
 
   return modeles;
+}
+
+export async function createModele(data){
+  data = data.data;
+  return await db.modele.create({
+    data: {
+      name: data.name,
+      marque: {
+        connect: {
+          id: Number(data.marqueId)
+        }
+      },
+      famille: {
+        connect: {
+          id: Number(data.familleId)
+        }
+      },
+      modeleTypes: {
+        createMany: {
+            data: data.typeIds.split(',').map(function(typeId) { return { typeId : Number(typeId) }})
+        }
+      }
+    }
+  })
+}
+
+function arrayDiff(array1, array2){
+  const isSameModele = (a, b) => a === b;
+  const onlyInLeft = (left, right, compareFunction) => 
+    left.filter(leftValue =>
+      !right.some(rightValue => 
+        compareFunction(leftValue, rightValue)));
+  
+  const onlyInA = onlyInLeft(array1, array2, isSameModele);
+  const onlyInB = onlyInLeft(array2, array1, isSameModele);
+  
+  return [...onlyInA, ...onlyInB];
 }
 
 export async function updateModele(id, data){
@@ -65,14 +107,28 @@ export async function updateModele(id, data){
       }
     }))
   }
+
   return await db.modele.update(({
     where: {
       id: id,
     },
     data: {
       name: data.name,
-      marqueId: data.marque,
-      productImage: data.productImage
+      marque: {
+        connect: {
+          id : Number(data.marqueId)
+        }
+      },
+      productImage: data.productImage,
+      famille: {
+        connect: {
+          id: Number(data.familleId)
+        }
+      },
+      modeleTypes: {
+        connectOrCreate: data.typeIds.split(",").map(function(typeId) { return { where : { modeleId_typeId : { typeId : Number(typeId), modeleId : id } }, create : { typeId : Number(typeId)}}}),
+        deleteMany: await db.modeleType.findMany({select: { id : true}, where: {typeId : { in: arrayDiff((await db.type.findMany()).map(function(type){ return String(type.id)}), data.typeIds.split(",")).map((typeId) => Number(typeId))}, modeleId : id}})
+      }
     },
   }))
 }
@@ -86,6 +142,14 @@ export function validateModele(data) {
 
   if (!data.marqueId) {
     errors.marque = "Un modèle doit être relié à une marque";
+  }
+
+  if (!data.familleId) {
+    errors.famille = "Un modèle doit appartenir à une famille de véhicule."
+  }
+
+  if(data.typeIds.length <= 0){
+    errors.type = "Un modèle doit avoir au moins un type de véhicule lié."
   }
 
   if (Object.keys(errors).length) {

@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://amended-room-map-grenada.trycloudflare.com"
+application_url = "https://ref-mechanics-correctly-logan.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_content"
 
 [auth]
 redirect_urls = [
-  "https://amended-room-map-grenada.trycloudflare.com/auth/callback",
-  "https://amended-room-map-grenada.trycloudflare.com/auth/shopify/callback",
-  "https://amended-room-map-grenada.trycloudflare.com/api/auth/callback"
+  "https://ref-mechanics-correctly-logan.trycloudflare.com/auth/callback",
+  "https://ref-mechanics-correctly-logan.trycloudflare.com/auth/shopify/callback",
+  "https://ref-mechanics-correctly-logan.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -42,7 +42,7 @@ api_version = "2024-10"
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://amended-room-map-grenada.trycloudflare.com/app/api"
+url = "https://ref-mechanics-correctly-logan.trycloudflare.com/app/api"
 subpath = "vehicule-compatible"
 prefix = "apps"
 

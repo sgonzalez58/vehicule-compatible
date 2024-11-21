@@ -8,10 +8,19 @@ import {
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
+import { getPage } from "../models/page.server";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ request }) => {
   await authenticate.admin(request);
-  return null;
+  let page = await getPage();
+  if(!page){
+    page = { id: null, name: "", idShopify: "", url: ""}
+  }
+  return json({
+    page: page
+  });
 };
 
 export const action = async ({ request }) => {
@@ -19,6 +28,7 @@ export const action = async ({ request }) => {
 };
 
 export default function Index() {
+  const { page } = useLoaderData();
   return (
     <Page>
       <TitleBar title="Compatibilité véhicule">
@@ -28,7 +38,6 @@ export default function Index() {
           <Layout.Section>
             <Card>
               <BlockStack gap="500">
-                <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
                     Bonjour et bienvenu dans l'application de compatibilité de véhicule.
                   </Text>
@@ -43,7 +52,17 @@ export default function Index() {
                     </Link>
                     .
                   </Text>
-                </BlockStack>
+                {page.id ? (
+                    <Text>
+                      La page principale de l'application se trouve aujourd'hui sur la page <a href={"https://admin.shopify.com/store/" + session.shop.split('.').shift() + "/pages/" + page.idShopify.split('/').pop()} target="_blank">{page.name}</a>
+                      <br/>Vous pouvez modifier le nom de la page ci-dessous.
+                    </Text>
+                  ) : (
+                    <Text>
+                      La page principale de l'application n'est pas défini. Vous pouvez la définir sur ce <Link url="/app/settings">lien</Link>.
+                    </Text>
+                  )
+                }
               </BlockStack>
             </Card>
           </Layout.Section>
