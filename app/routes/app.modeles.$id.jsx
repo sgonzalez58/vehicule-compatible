@@ -22,7 +22,12 @@ import {
   IndexTable,
   Thumbnail,
   ChoiceList,
+  Icon,
 } from "@shopify/polaris";
+import {
+  CheckCircleIcon,
+  XCircleIcon
+} from '@shopify/polaris-icons';
 
 import db from "../db.server";
 
@@ -141,20 +146,16 @@ export default function modeleForm() {
   }
 
   function handleFamilleChange(selectedFamilleId) {
-    const selectedFamille = familles.find((famille) => famille.id === Number(selectedFamilleId));
-
     setFormState({
       ...formState,
-      familleId: selectedFamille.id,
+      familleId: selectedFamilleId,
     });
   }
 
   function handleMarqueChange(selectedMarqueId) {
-    const selectedMarque = marques.find((marque) => marque.id === Number(selectedMarqueId));
-
     setFormState({
       ...formState,
-      marqueId: selectedMarque.id,
+      marqueId: selectedMarqueId,
     });
   }
 
@@ -162,7 +163,9 @@ export default function modeleForm() {
     let data = {
       name: formState.name,
       marqueId: formState.marqueId,
-      produitId: Number(produitId)
+      typeIds: formState.typeIds,
+      familleId: formState.familleId,
+      addProduitId: Number(produitId)
     };
     
     setCleanFormState({ ...formState });
@@ -173,6 +176,8 @@ export default function modeleForm() {
     let data = {
       name: formState.name,
       marqueId: formState.marqueId,
+      typeIds: formState.typeIds,
+      familleId: formState.familleId,
       deleteProduitId: Number(modeleId)
     };
     
@@ -245,6 +250,8 @@ export default function modeleForm() {
         headings={[
           { title: "Thumbnail"},
           { title: "Nom" },
+          { title: "VP"},
+          { title: "VU"},
           { title: "Supprimer" },
         ]}
       >
@@ -266,6 +273,46 @@ export default function modeleForm() {
       </IndexTable.Cell>
       <IndexTable.Cell>
         {truncate(produit.productName)}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP").length > 0 ? 
+          modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+              <Icon
+                source={CheckCircleIcon}
+                tone="base"
+              /> Supprimer ?
+            </Button>
+          ) : (
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+              <Icon
+                source={XCircleIcon}
+                tone="base"
+              /> Ajouter ?
+            </Button>
+        ) : (
+          <Text>Na</Text>
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU").length > 0 ? 
+          modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+              <Icon
+                  source={CheckCircleIcon}
+                  tone="base"
+                /> Supprimer ?
+            </Button>
+          ) : (
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+              <Icon
+                  source={XCircleIcon}
+                  tone="base"
+                /> Ajouter ?
+            </Button>
+        ) : (
+          <Text>Na</Text>
+        )}
       </IndexTable.Cell>
       <IndexTable.Cell>
         <Button tone="critical" variant="primary" onClick={() => supprimerProduct(produit.id)}>

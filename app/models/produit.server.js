@@ -33,14 +33,26 @@ export async function getProduits() {
 }
 
 export async function updateProduit(id, data){
-  if(data.modeleId){
+  if(data.addModeleId){
     return await db.produit.update(({
       where: {
         id: id,
       },
       data : {
         modeleTypes: {
-          connect: await db.modeleType.findMany({select: { id: true}, where: {modeleId : id}})
+          connect: await db.modeleType.findMany({select: { id: true}, where: {modeleId : Number(data.addModeleId)}})
+        },
+      }
+    }))
+  }
+  if(data.deleteModeleId){
+    return await db.produit.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        modeleTypes: {
+          disconnect: await db.modeleType.findMany({select: { id: true}, where: {modeleId : Number(data.deleteModeleId)}})
         },
       }
     }))
@@ -53,6 +65,18 @@ export async function updateProduit(id, data){
       data : {
         modeleTypes: {
           disconnect: { id: Number(data.deleteModeleTypeId) }
+        },
+      }
+    }))
+  }
+  if(data.addModeleTypeId){
+    return await db.produit.update(({
+      where: {
+        id: id,
+      },
+      data : {
+        modeleTypes: {
+          connect: { id: Number(data.addModeleTypeId) }
         },
       }
     }))

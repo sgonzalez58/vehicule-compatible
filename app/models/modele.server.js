@@ -10,7 +10,8 @@ export async function getModele(id) {
       famille: true,
       modeleTypes: {
         include: {
-          produits: true
+          produits: true,
+          type: true,
         }
       },
     }
@@ -83,15 +84,26 @@ function arrayDiff(array1, array2){
 }
 
 export async function updateModele(id, data){
-  if(data.produitId){
+  if(data.addProduitId){
     return await db.modele.update(({
       where: {
         id: id,
       },
       data : {
-        produits: {
-          connect: { id: Number(data.produitId) }
-        },
+        modeleTypes: {
+          updateMany : {
+            where : {
+              modeleId : id
+            },
+            data: {
+              produits : {
+                connect : {
+                  id : Number(data.addProduitId)
+                }
+              }
+            }
+          } 
+        }
       }
     }))
   }

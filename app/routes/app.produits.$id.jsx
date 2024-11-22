@@ -20,7 +20,12 @@ import {
   Thumbnail,
   EmptyState,
   IndexTable,
+  Icon,
 } from "@shopify/polaris";
+import {
+  CheckCircleIcon,
+  XCircleIcon
+} from '@shopify/polaris-icons';
 
 import db from "../db.server";
 
@@ -28,7 +33,6 @@ import { getMarques } from "../models/marque.server";
 import { getModeles } from "../models/modele.server";
 import { getProduit, updateProduit, validateProduit } from "../models/produit.server";
 import { authenticate } from "../shopify.server";
-import { getTypes } from "../models/type.server";
 
 export async function loader({ params, request }) {
   const { session } = await authenticate.admin(request);
@@ -38,18 +42,17 @@ export async function loader({ params, request }) {
       modeles: await getModeles(),
       session,
       marques : await getMarques(),
-      types: await getTypes()
+      produitModeles: []
     });
   }
   const marques = await getMarques();
   const modeles = await getModeles();
   const produit = await getProduit(Number(params.id))
-  const types = await getTypes();
 
   const produitModeles = [];
 
   for (const modeleType of produit.modeleTypes){
-    if(!produitModeles.includes(modeleType.modele)){
+    if(!produitModeles.map((modele) => modele.id).includes(modeleType.modeleId)){
       produitModeles.push(modeleType.modele);
     }
   }
@@ -59,14 +62,13 @@ export async function loader({ params, request }) {
     modeles,
     session,
     marques,
-    types,
     produitModeles
   });
 }
 
 export async function action({ request, params }) {
 
-  const { admin } = await authenticate.admin(request);
+  await authenticate.admin(request);
 
   /** @type {any} */
   const data = {
@@ -95,7 +97,7 @@ export async function action({ request, params }) {
 export default function modeleForm() {
   const errors = useActionData()?.errors || {};
 
-  const { produit = {}, modeles = [], session, marques = [], types = [], produitModeles = [] } = useLoaderData();
+  const { produit = {}, modeles = [], session, marques = [], produitModeles = [] } = useLoaderData();
   const [formState, setFormState] = useState(produit || {});
   const [cleanFormState, setCleanFormState] = useState(produit || {});
   const isDirty = JSON.stringify(formState) !== JSON.stringify(cleanFormState);
@@ -145,14 +147,16 @@ export default function modeleForm() {
       productImage: formState.productImage,
       productUrl: formState.productUrl,
       productPrice: formState.productPrice,
-      modeleId: Number(selectedModeleId)
+      addModeleId: Number(selectedModeleId)
     };
+
+    produitModeles.push(modeles.find((selectModele) => selectModele.id === Number(selectedModeleId)))
     
     setCleanFormState({ ...formState });
     submit(data, { method: "post" });
   }
 
-  function supprimerProduct(modeleTypeId) {
+  function supprimerModeleType(modeleTypeId) {
     let data = {
       productId: formState.productId,
       productName: formState.productName,
@@ -160,6 +164,38 @@ export default function modeleForm() {
       productUrl: formState.productUrl,
       productPrice: formState.productPrice,
       deleteModeleTypeId: Number(modeleTypeId)
+    };
+
+    produitModeles.slice(produitModeles.map((selectedModele) => selectedModele.id).indexOf(modeleTypeId), 1)
+    
+    setCleanFormState({ ...formState });
+    submit(data, { method: "post" });
+
+  }
+
+  function ajouterModeleType(modeleTypeId) {
+    let data = {
+      productId: formState.productId,
+      productName: formState.productName,
+      productImage: formState.productImage,
+      productUrl: formState.productUrl,
+      productPrice: formState.productPrice,
+      addModeleTypeId: Number(modeleTypeId)
+    };
+    
+    setCleanFormState({ ...formState });
+    submit(data, { method: "post" });
+
+  }  
+
+  function supprimerModele(modeleId) {
+    let data = {
+      productId: formState.productId,
+      productName: formState.productName,
+      productImage: formState.productImage,
+      productUrl: formState.productUrl,
+      productPrice: formState.productPrice,
+      deleteModeleId: Number(modeleId)
     };
     
     setCleanFormState({ ...formState });
@@ -184,7 +220,7 @@ export default function modeleForm() {
           label: modele.marque.name + ' ' + modele.name,
           value: modele.id,
         }))}
-        value={formState.modeleId || ""}
+        value={formState.addModeleId || ""}
         onChange={handleModeleAdd}
         placeholder="Choisir un véhicule"
       />
@@ -222,7 +258,7 @@ export default function modeleForm() {
           label: modele.marque.name + ' ' + modele.name,
           value: modele.id,
         }))}
-        value={formState.modeleId || ""}
+        value={formState.addModeleId || ""}
         onChange={handleModeleAdd}
         placeholder="Choisir un véhicule"
       />
@@ -264,8 +300,48 @@ export default function modeleForm() {
         )}
       </IndexTable.Cell>
       <IndexTable.Cell>
-        <Button tone="critical" variant="primary" onClick={() => supprimerProduct(modeleTypeId)}>
-          Supprimer
+        {modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VP").length > 0 ? 
+          modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+              <Icon
+                source={CheckCircleIcon}
+                tone="base"
+              /> Supprimer ?
+            </Button>
+          ) : (
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+              <Icon
+                source={XCircleIcon}
+                tone="base"
+              /> Ajouter ?
+            </Button>
+        ) : (
+          <Text>Na</Text>
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VU").length > 0 ? 
+          modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+              <Icon
+                  source={CheckCircleIcon}
+                  tone="base"
+                /> Supprimer ?
+            </Button>
+          ) : (
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modeles.find((selectModele) => selectModele.id === Number(modele.id)).modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+              <Icon
+                  source={XCircleIcon}
+                  tone="base"
+                /> Ajouter ?
+            </Button>
+        ) : (
+          <Text>Na</Text>
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Button tone="critical" variant="primary" onClick={() => supprimerModele(modele.id)}>
+          Tous supprimer
         </Button>
       </IndexTable.Cell>
     </IndexTable.Row>
