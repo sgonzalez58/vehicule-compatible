@@ -149,8 +149,6 @@ export default function modeleForm() {
       productPrice: formState.productPrice,
       addModeleId: Number(selectedModeleId)
     };
-
-    produitModeles.push(modeles.find((selectModele) => selectModele.id === Number(selectedModeleId)))
     
     setCleanFormState({ ...formState });
     submit(data, { method: "post" });
@@ -165,8 +163,6 @@ export default function modeleForm() {
       productPrice: formState.productPrice,
       deleteModeleTypeId: Number(modeleTypeId)
     };
-
-    produitModeles.slice(produitModeles.map((selectedModele) => selectedModele.id).indexOf(modeleTypeId), 1)
     
     setCleanFormState({ ...formState });
     submit(data, { method: "post" });

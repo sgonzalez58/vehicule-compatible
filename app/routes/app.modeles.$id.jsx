@@ -48,7 +48,8 @@ export async function loader({ params, request }) {
       marques: await getMarques(),
       produits: await getProduits(),
       types: await getTypes(),
-      familles: await getFamilles()
+      familles: await getFamilles(),
+      modeleProduits: []
     });
   }
 
@@ -58,7 +59,7 @@ export async function loader({ params, request }) {
 
   for (const modeleType of modele.modeleTypes){
     for (const produit of modeleType.produits){
-      if(!modeleProduits.includes(produit)){
+      if(!modeleProduits.map((produit) => produit.id).includes(produit.id)){
         modeleProduits.push(produit);
       }
     }
@@ -172,13 +173,42 @@ export default function modeleForm() {
     submit(data, { method: "post" });
   }
 
-  function supprimerProduct(modeleId) {
+  function supprimerProduct(produitId) {
     let data = {
       name: formState.name,
       marqueId: formState.marqueId,
       typeIds: formState.typeIds,
       familleId: formState.familleId,
-      deleteProduitId: Number(modeleId)
+      deleteProduitId: Number(produitId)
+    };
+    
+    setCleanFormState({ ...formState });
+    submit(data, { method: "post" });
+
+  }
+
+  function ajouterModeleTypeProduit(modeleTypeId, produitId) {
+    let data = {
+      name: formState.name,
+      marqueId: formState.marqueId,
+      typeIds: formState.typeIds,
+      familleId: formState.familleId,
+      addModeleTypeId: Number(modeleTypeId),
+      addModeleTypeProduitId: Number(produitId)
+    };
+    
+    setCleanFormState({ ...formState });
+    submit(data, { method: "post" });
+  }
+
+  function supprimerModeleTypeProduit(modeleTypeId, produitId) {
+    let data = {
+      name: formState.name,
+      marqueId: formState.marqueId,
+      typeIds: formState.typeIds,
+      familleId: formState.familleId,
+      deleteModeleTypeId: Number(modeleTypeId),
+      deleteModeleTypeProduitId: Number(produitId)
     };
     
     setCleanFormState({ ...formState });
@@ -277,14 +307,14 @@ export default function modeleForm() {
       <IndexTable.Cell>
         {modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP").length > 0 ? 
           modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
-            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleTypeProduit(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id, produit.id)}>
               <Icon
                 source={CheckCircleIcon}
                 tone="base"
               /> Supprimer ?
             </Button>
           ) : (
-            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id)}>
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleTypeProduit(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VP")[0].id, produit.id)}>
               <Icon
                 source={XCircleIcon}
                 tone="base"
@@ -297,14 +327,14 @@ export default function modeleForm() {
       <IndexTable.Cell>
         {modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU").length > 0 ? 
           modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].produits.map((produit) => produit.id).includes(produit.id) ? (
-            <Button tone="success" variant="primary" onClick={() => supprimerModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+            <Button tone="success" variant="primary" onClick={() => supprimerModeleTypeProduit(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id, produit.id)}>
               <Icon
                   source={CheckCircleIcon}
                   tone="base"
                 /> Supprimer ?
             </Button>
           ) : (
-            <Button tone="critical" variant="primary" onClick={() => ajouterModeleType(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id)}>
+            <Button tone="critical" variant="primary" onClick={() => ajouterModeleTypeProduit(modele.modeleTypes.filter((modeleType) => modeleType.type.name == "VU")[0].id, produit.id)}>
               <Icon
                   source={XCircleIcon}
                   tone="base"

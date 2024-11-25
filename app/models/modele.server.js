@@ -85,37 +85,74 @@ function arrayDiff(array1, array2){
 
 export async function updateModele(id, data){
   if(data.addProduitId){
+    await db.produit.update(({
+      where: {
+        id: Number(data.addProduitId),
+      },
+      data : {
+        modeleTypes: {
+          connect: await db.modeleType.findMany({select: { id : true}, where: {modeleId: id}})
+        }
+      }
+    }))
+    return await db.modele.findFirst({where: { id : id}});
+  }
+  if(data.deleteProduitId){
+    await db.produit.update(({
+      where: {
+        id: Number(data.deleteProduitId)
+      },
+      data : {
+        modeleTypes: {
+          disconnect: await db.modeleType.findMany({select: {id: true}, where: {modeleId: id}})
+        },
+      }
+    }))
+    return await db.modele.findFirst({where: { id : id}});
+  }
+  if(data.addModeleTypeId){
     return await db.modele.update(({
       where: {
         id: id,
       },
       data : {
         modeleTypes: {
-          updateMany : {
-            where : {
-              modeleId : id
-            },
+          update: {
             data: {
-              produits : {
-                connect : {
-                  id : Number(data.addProduitId)
+              produits: {
+                connect: {
+                  id : Number(data.addModeleTypeProduitId)
                 }
               }
+            },
+            where: {
+              id: Number(data.addModeleTypeId)
             }
-          } 
+          }
         }
       }
     }))
   }
-  if(data.deleteProduitId){
+  if(data.deleteModeleTypeId){
     return await db.modele.update(({
       where: {
         id: id,
       },
       data : {
-        produits: {
-          disconnect: { id: Number(data.deleteProduitId) }
-        },
+        modeleTypes: {
+          update: {
+            data: {
+              produits: {
+                disconnect: {
+                  id : Number(data.deleteModeleTypeProduitId)
+                }
+              }
+            },
+            where: {
+              id: Number(data.deleteModeleTypeId)
+            }
+          }
+        }
       }
     }))
   }
