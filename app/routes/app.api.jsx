@@ -4,9 +4,14 @@ import { authenticate } from "../shopify.server";
 import { getModele, getVehicules } from "../models/modele.server";
 import { getPage } from "../models/page.server";
 
+import db from "../db.server";
+
 export const loader = async ({request}) => {
   await authenticate.public.appProxy(request);
   const {searchParams} = new URL(request.url);
+
+  const typeVU = await db.type.findFirst({select: { id : true }, where: { name : "VU" }})
+  const typeVP = await db.type.findFirst({select: { id : true }, where: { name : "VP" }})
 
   let appPage = await getPage();
   if(!appPage){
@@ -24,14 +29,25 @@ export const loader = async ({request}) => {
                     <input type="submit" value="recherche">
                   </form>
                 </div>`
-    if(modele.produits.length == 0){
-      page += `<p class="compatibilite-vehicule-message">Nous sommes désolés, aucun de nos produits n'est compatible avec votre véhicule.</p>`
-    }else{
-      page += `   <div class="compatibilite-vehicule-produits-wrapper">
-                    <h2>Voici la liste de produits compatibles avec votre véhicule</h2>
-                    <div class="compatibilite-vehicule-produits-flex">
-                      `;
-      for( const produit of modele.produits){
+    let nbModeleType = 0;
+    for(const [index, modeleType] of modele.modeleTypes.entries()){
+      console.log(index, modeleType)
+      nbModeleType ++;
+      if(index == 0){
+        page += `   <div class="compatibilite-vehicule-produits-wrapper">
+        <h2>Voici la liste de produits compatibles avec votre véhicule</h2>`;
+      }
+      if (modeleType.type.name == 'VU'){
+        page += `<h3>Véhicule Utilitaire</h3>
+          <div class="compatibilite-vehicule-produits-flex">`
+      }else{
+        page += `<h3>Véhicule Particulier</h3>
+          <div class="compatibilite-vehicule-produits-flex">`
+      }
+      if (modeleType.produits.length == 0){
+        page += `<p class="compatibilite-vehicule-message">Nous sommes désolés, aucun de nos produits n'est compatible avec votre véhicule.</p>`
+      }
+      for( const produit of modeleType.produits){
         page += `     <a href="` + produit.productUrl + `" class="compatibilite-vehicule-produit">
                         <img src="` + produit.productImage + `" width=400>
                         <div class="compatibilite-vehicule-produit-info">
@@ -39,11 +55,16 @@ export const loader = async ({request}) => {
                           <p>A partir de <span>` + String(produit.productPrice).replace('.', ',') + `€</span></p>
                           <div>Voir le produit</div>
                         </div>
-                      </a>`
+                      </a>
+                    </div>`
       }
-      page += `     </div>
-                  </div>
+    }    
+    if(nbModeleType == 0){
+      page += `<p class="compatibilite-vehicule-message">Nous sommes désolés, aucun de nos produits n'est compatible avec votre véhicule.</p>`
+    }else{
+      page += ` </div>
                 `;
+      
     }
     return json({
       modele: modele,
@@ -57,9 +78,14 @@ export const loader = async ({request}) => {
                 <div class="compatibilite-vehicule-wrapper">
                 <h2>Vérifiez la compatibilité de votre véhicule</h2>
                 <form id="vehicule-compatible-form" method="GET">
-                  <select id="vehicule-compatible-marque"></select>
-                  <select id="vehicule-compatible-modele" name="vehicule" required disabled></select>
-                  <input type="submit" value="recherche">
+                  <label for="vehicule-compatible-form-checkbox-vu" class='vehicule-compatible-form-checkbox-type-label'>
+                      <p>Mon véhicule ne possède pas de sièges arrières</p>
+                  </label>
+                  <label for="vehicule-compatible-form-checkbox-vp" class="vehicule-compatible-form-checkbox-type-label">
+                      <p>Mon véhicule possède des sièges arrières</p>
+                  </label>
+                  <input type='checkbox' value="${typeVP.id}" id="vehicule-compatible-form-checkbox-vp" class="vehicule-compatible-form-checkbox-type">
+                  <input type='checkbox' value="${typeVU.id}" id="vehicule-compatible-form-checkbox-vu" class="vehicule-compatible-form-checkbox-type">
                 </form>
               </div>
             `

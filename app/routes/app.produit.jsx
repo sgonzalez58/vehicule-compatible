@@ -74,7 +74,7 @@ const TableProduitsLigne = ({ produit }) => (
       {truncate(produit.productName)}
     </IndexTable.Cell>
     <IndexTable.Cell>
-      {produit.modeles ? produit.modeles.length : 0}
+      {produit.modeleTypes.length}
     </IndexTable.Cell>
     <IndexTable.Cell>
       <Link to={`/app/produits/${produit.id}`}>Modifier</Link>

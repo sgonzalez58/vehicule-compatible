@@ -52,6 +52,7 @@ function mainPage(){
             let form = document.getElementById("vehicule-compatible-form");
             let select_marque = document.getElementById('vehicule-compatible-marque');
             let select_modele = document.getElementById('vehicule-compatible-modele');
+            let checkbox_type = document.getElementsByClassName('vehicule-compatible-form-checkbox-type');
             let marques = [];
             let modeles = [];
             let modeles_recup = obj.modeles;
@@ -61,7 +62,7 @@ function mainPage(){
               return;
             }
             form.setAttribute('action', obj.appPage)
-            if(select_marque.children.length == 0){
+            if(select_marque?.children.length == 0){
               let option = document.createElement("option");
               option.innerText = "Marque";
               if(!vehicule){
@@ -69,7 +70,7 @@ function mainPage(){
               }
               select_marque.appendChild(option);
             }
-            if(select_modele.children.length == 0){
+            if(select_modele?.children.length == 0){
               option = document.createElement("option");
               option.innerText = "Modèle";
               if(!vehicule){
@@ -80,11 +81,11 @@ function mainPage(){
               select_modele.appendChild(option);
             }
             Array.from(modeles_recup).forEach(modele =>{
-              if(!marques[modele.marqueId])
-                marques[modele.marqueId] = modele.marque.name;
-              modeles[modele.id] = {name : modele.name, marqueId : modele.marqueId};
+              if(marques.map((marque) => marque.id).filter((marqueId) => marqueId == modele.marque.id).length == 0)
+                marques.push({ name: modele.marque.name, id: modele.marque.id});
+              modeles[modele.id] = {name : modele.name, marque: modele.marque, modeleTypes: modele.modeleTypes, famille: modele.famille};
             })
-            select_marque.addEventListener('change', (e)=>{
+            select_marque?.addEventListener('change', (e)=>{
               let marqueId = e.target.value;
               select_modele.innerHTML = "";
               option = document.createElement("option");
@@ -97,7 +98,7 @@ function mainPage(){
               else{
                 select_modele.removeAttribute("disabled");
                 modeles.forEach((modele, modeleId) => {
-                  if(modele.marqueId == marqueId){
+                  if(modele.marque.id == marqueId){
                     let option = document.createElement("option");
                     option.innerText = modele.name;
                     if(vehicule){
@@ -111,31 +112,109 @@ function mainPage(){
                 })
               }
             })
-            marques.forEach((marqueName, marqueId ) => {
-              let option = document.createElement("option");
-              option.innerText = marqueName;
-              if(vehicule){
-                if(obj.modele.marqueId == marqueId){
-                  option.toggleAttribute('selected')
-                }
-              }
-              option.setAttribute("value", marqueId);
-              select_marque.appendChild(option);
-            })
-            if(vehicule){
-              modeles.forEach((modele, modeleId) => {
-                if(modele.marqueId == obj.modele.marqueId){
-                  let option = document.createElement("option");
-                  option.innerText = modele.name;
-                  if(obj.modele.id == modeleId){
+            if(select_marque){
+              for (const marque of marques){
+                let option = document.createElement("option");
+                option.innerText = marque.name;
+                if(vehicule){
+                  if(obj.modele.marque.id == marque.id){
                     option.toggleAttribute('selected')
                   }
-                  option.setAttribute("value", modeleId);
-                  select_modele.appendChild(option);
                 }
+                option.setAttribute("value", marque.id);
+                select_marque.appendChild(option);
+              }
+              if(vehicule){
+                modeles.forEach((modele, modeleId) => {
+                  if(modele.marque.id == obj.modele.marque.id){
+                    let option = document.createElement("option");
+                    option.innerText = modele.name;
+                    if(obj.modele.id == modeleId){
+                      option.toggleAttribute('selected')
+                    }
+                    option.setAttribute("value", modeleId);
+                    select_modele.appendChild(option);
+                  }
+                })
+              }
+            }
+            if (checkbox_type.length > 0){
+              Array.from(checkbox_type).forEach(type => {
+                type.addEventListener('change', ()=>{etape_famille(modeles.filter((modele) => modele.modeleTypes.map((modeleType) => modeleType.typeId).includes(Number(type.value))))})
               })
             }
-          }                      
+          }
+          function etape_famille(modeles){
+            let form = document.getElementById("vehicule-compatible-form");
+            form.innerHTML = "";
+            let familles = [];
+            for (const modele of modeles){
+              if(!familles.includes(modele.famille.id)){
+                familles.push(modele.famille.id)
+                const choix = document.createElement("label");
+                choix.innerText = modele.famille.name;
+                const choix_value = document.createElement("input");
+                choix_value.value = modele.famille.id;
+                choix.setAttribute('for', 'vehicule-compatible-form-checkbox-famille-'+modele.famille.id);
+                choix.setAttribute('class', 'vehicule-compatible-form-checkbox-famille-label')
+                choix_value.setAttribute('id', 'vehicule-compatible-form-checkbox-famille-'+modele.famille.id);
+                choix_value.setAttribute('class', 'vehicule-compatible-form-checkbox-famille')
+                choix_value.setAttribute('type', 'checkbox')
+                form.appendChild(choix);
+                form.appendChild(choix_value);
+              }
+            }
+            const checkbox_famille = document.getElementsByClassName("vehicule-compatible-form-checkbox-famille")
+            Array.from(checkbox_famille).forEach(famille => {
+              famille.addEventListener('change', ()=>{etape_marque(modeles.filter((modele) => modele.famille.id == famille.value))})
+            })
+          }
+          function etape_marque(modeles){
+            let form = document.getElementById("vehicule-compatible-form");
+            form.innerHTML = "";
+            let marques = [];
+            for (const modele of modeles){
+              if(!marques.includes(modele.marque.id)){
+                marques.push(modele.marque.id)
+                const choix = document.createElement("label");
+                choix.innerText = modele.marque.name;
+                const choix_value = document.createElement("input");
+                choix_value.value = modele.marque.id;
+                choix.setAttribute('for', 'vehicule-compatible-form-checkbox-marque-'+modele.marque.id);
+                choix.setAttribute('class', 'vehicule-compatible-form-checkbox-marque-label')
+                choix_value.setAttribute('id', 'vehicule-compatible-form-checkbox-marque-'+modele.marque.id);
+                choix_value.setAttribute('class', 'vehicule-compatible-form-checkbox-marque')
+                choix_value.setAttribute('type', 'checkbox')
+                form.appendChild(choix);
+                form.appendChild(choix_value);
+              }
+            }
+            const checkbox_marque = document.getElementsByClassName("vehicule-compatible-form-checkbox-marque")
+            Array.from(checkbox_marque).forEach(marque => {
+              marque.addEventListener('change', ()=>{etape_modele(modeles.filter((modele) => modele.marque.id == marque.value))})
+            })
+          }   
+          function etape_modele(modeles){
+            let form = document.getElementById("vehicule-compatible-form");
+            form.innerHTML = "";
+            for (const modele of modeles){
+              const choix = document.createElement("label");
+              choix.innerText = modele.name;
+              const choix_value = document.createElement("input");
+              choix_value.value = modele.id;
+              choix.setAttribute('for', 'vehicule-compatible-form-checkbox-modele-'+modele.id);
+              choix.setAttribute('class', 'vehicule-compatible-form-checkbox-modele-label')
+              choix_value.setAttribute('id', 'vehicule-compatible-form-checkbox-modele-'+modele.id);
+              choix_value.setAttribute('class', 'vehicule-compatible-form-checkbox-modele')
+              choix_value.setAttribute('type', 'checkbox')
+              form.appendChild(choix);
+              form.appendChild(choix_value); 
+            }
+            const checkbox_modele = document.getElementsByClassName("vehicule-compatible-form-checkbox-modele")
+            Array.from(checkbox_modele).forEach(modele => {
+              modele.addEventListener('change', ()=>{get_produit_modele(modele.value)})
+            })
+          }
         </script>
         <style>
           .main-page-title {
@@ -158,8 +237,28 @@ function mainPage(){
           }
           .compatibilite-vehicule-wrapper form{
             display:flex;
-            justify-content:space-between;
+            justify-content:center;;
             padding:20px;
+            gap: 10px 20px;
+            flex-wrap:wrap;
+          }
+          .vehicule-compatible-form-checkbox-type, .vehicule-compatible-form-checkbox-famille, .vehicule-compatible-form-checkbox-marque, .vehicule-compatible-form-checkbox-modele{
+            display : none!important;
+          }
+          .vehicule-compatible-form-checkbox-type-label, .vehicule-compatible-form-checkbox-famille-label, .vehicule-compatible-form-checkbox-marque-label, .vehicule-compatible-form-checkbox-modele-label{
+            display:flex;
+            align-items:center;
+            justify-content: center;
+            background-color: #E8E8E8;
+            border: 1px solid #242424;
+            width: clamp(200px, 100%, 330px);
+            border-radius: 3px;
+            padding: 20px;
+            text-align:center;
+            cursor:pointer;
+          }
+          .vehicule-compatible-form-checkbox-type-label:active, .vehicule-compatible-form-checkbox-famille-label:active, .vehicule-compatible-form-checkbox-marque-label:active, .vehicule-compatible-form-checkbox-modele-label:active{
+            background-color: #D0D0D0;
           }
           .compatibilite-vehicule-wrapper form select{
             font-size:18px;
@@ -168,7 +267,7 @@ function mainPage(){
             border: 1px solid #242424;
             width: 30%;
           }
-          .compatibilite-vehicule-wrapper form input{
+          .compatibilite-vehicule-wrapper form input[type=submit]{
             font-size:18px;
             padding: 18px 4px;
             border-radius: 5px;

@@ -38,7 +38,7 @@ export async function getModeles() {
 export async function getVehicules() {
   const modeles = await db.modele.findMany({
     orderBy: { id: "desc" },
-    include: { marque: true }
+    include: { marque: true, famille: true, modeleTypes: true }
   });
 
   if (modeles.length === 0) return [];
