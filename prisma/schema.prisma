@@ -50,6 +50,7 @@ model Type {
   familles      Famille[]
   modeleTypes   ModeleType[]
   name          String    @unique
+  help          String
 }
 
 model Marque {
@@ -80,11 +81,12 @@ model ModeleType {
 }
 
 model Produit {
-  id            Int       @id @default(autoincrement())
-  productId     String    @unique
-  productName   String
-  productImage  String
-  productUrl    String
-  productPrice  Decimal   @default(0)
-  modeleTypes   ModeleType[]
+  id                    Int           @id @default(autoincrement())
+  productId             String        @unique
+  productName           String
+  productImage          String
+  productUrl            String
+  productPrice          Decimal       @default(0)
+  modeleTypes           ModeleType[]
+  infosComplementaires  String        @default("")
 }

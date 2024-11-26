@@ -21,6 +21,7 @@ import {
   EmptyState,
   IndexTable,
   Icon,
+  TextField,
 } from "@shopify/polaris";
 import {
   CheckCircleIcon,
@@ -353,6 +354,7 @@ export default function modeleForm() {
       productImage: formState.productImage,
       productUrl: formState.productUrl,
       productPrice: formState.productPrice,
+      infosComplementaires: formState.infosComplementaires
     };
     
     setCleanFormState({ ...formState });
@@ -406,6 +408,25 @@ export default function modeleForm() {
                 )}
               </BlockStack>
             </Card>
+            {produit.id ? (
+              <Card>
+                <BlockStack gap="500">
+                  <Text as={"h2"} variant="headingLg">
+                    Info complémentaire
+                  </Text>
+                  <TextField
+                    id="infosComplementaires"
+                    helpText="Texte pour indiquer toutes informations complémentaires au produit"
+                    label="infosComplementaires"
+                    labelHidden
+                    autoComplete="off"
+                    value={formState.infosComplementaires}
+                    onChange={(infosComplementaires) => setFormState({ ...formState, infosComplementaires })}
+                  />
+                </BlockStack>
+              </Card>
+            ) : ""
+            } 
             {produit.id ? (
               <Card padding="0">
               {produitModeles.length === 0 ?

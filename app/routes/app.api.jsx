@@ -10,8 +10,8 @@ export const loader = async ({request}) => {
   await authenticate.public.appProxy(request);
   const {searchParams} = new URL(request.url);
 
-  const typeVU = await db.type.findFirst({select: { id : true }, where: { name : "VU" }})
-  const typeVP = await db.type.findFirst({select: { id : true }, where: { name : "VP" }})
+  const typeVU = await db.type.findFirst({select: { id : true, help : true }, where: { name : "VU" }})
+  const typeVP = await db.type.findFirst({select: { id : true, help: true }, where: { name : "VP" }})
 
   let appPage = await getPage();
   if(!appPage){
@@ -22,13 +22,13 @@ export const loader = async ({request}) => {
     let modele = await getModele(Number(searchParams.get("vehicule")))
     let page = `<h1 class="compatibilite-vehicule-main-title">Compatibilité du véhicule</h1>
                   <div class="compatibilite-vehicule-wrapper">
-                  <h2>Vérifiez la compatibilité de votre véhicule</h2>
-                  <form id="vehicule-compatible-form" method="GET">
-                    <select id="vehicule-compatible-marque"></select>
-                    <select id="vehicule-compatible-modele" name="vehicule" required disabled></select>
-                    <input type="submit" value="recherche">
-                  </form>
-                </div>`
+                    <h2>Vérifiez la compatibilité de votre véhicule</h2>
+                    <form id="vehicule-compatible-form" method="GET">
+                      <select id="vehicule-compatible-marque"></select>
+                      <select id="vehicule-compatible-modele" name="vehicule" required disabled></select>
+                      <input type="submit" value="recherche">
+                    </form>
+                  </div>`
     let nbModeleType = 0;
     for(const [index, modeleType] of modele.modeleTypes.entries()){
       console.log(index, modeleType)
@@ -51,12 +51,14 @@ export const loader = async ({request}) => {
         page += `     <a href="` + produit.productUrl + `" class="compatibilite-vehicule-produit">
                         <img src="` + produit.productImage + `" width=400>
                         <div class="compatibilite-vehicule-produit-info">
-                          <h3>` + produit.productName + `</h3>
-                          <p>A partir de <span>` + String(produit.productPrice).replace('.', ',') + `€</span></p>
-                          <div>Voir le produit</div>
+                          <h4>` + produit.productName + `</h4>
+                          <p>A partir de <span>${String(produit.productPrice).replace('.', ',')}€</span></p>`
+        if(produit.infosComplementaires != ""){
+          page += `       <p class="compatibilite-vehicule-produit-infos-complementaires">${produit.infosComplementaires}</p>`
+        }
+        page += `         <div>Voir le produit</div>
                         </div>
-                      </a>
-                    </div>`
+                      </a>`
       }
     }    
     if(nbModeleType == 0){
@@ -77,15 +79,29 @@ export const loader = async ({request}) => {
   let page = `<h1 class="compatibilite-vehicule-main-title">Compatibilité du véhicule</h1>
                 <div class="compatibilite-vehicule-wrapper">
                 <h2>Vérifiez la compatibilité de votre véhicule</h2>
+                <div class="compatibilite-vehicule-filtres">
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-type">
+                    Type - 
+                  </div>
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-famille">
+                    Famille - 
+                  </div>
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-marque">
+                    Marque - 
+                  </div>
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-modele">
+                    Modele - 
+                  </div>
+                </div>
                 <form id="vehicule-compatible-form" method="GET">
                   <label for="vehicule-compatible-form-checkbox-vu" class='vehicule-compatible-form-checkbox-type-label'>
-                      <p>Mon véhicule ne possède pas de sièges arrières</p>
+                      <p>${typeVU.help}</p>
                   </label>
                   <label for="vehicule-compatible-form-checkbox-vp" class="vehicule-compatible-form-checkbox-type-label">
-                      <p>Mon véhicule possède des sièges arrières</p>
+                      <p>${typeVP.help}</p>
                   </label>
-                  <input type='checkbox' value="${typeVP.id}" id="vehicule-compatible-form-checkbox-vp" class="vehicule-compatible-form-checkbox-type">
-                  <input type='checkbox' value="${typeVU.id}" id="vehicule-compatible-form-checkbox-vu" class="vehicule-compatible-form-checkbox-type">
+                  <input type='checkbox' value="${typeVP.id}" id="vehicule-compatible-form-checkbox-vp" class="vehicule-compatible-form-checkbox-type" value_name="VP">
+                  <input type='checkbox' value="${typeVU.id}" id="vehicule-compatible-form-checkbox-vu" class="vehicule-compatible-form-checkbox-type" value_name="VU">
                 </form>
               </div>
             `

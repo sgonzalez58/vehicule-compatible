@@ -7,10 +7,12 @@ async function main() {
         {
             type: "VU",
             famille: ["Ludospace", "Van", "Fourgon"],
+            help: "Mon véhicule ne possède pas de sièges arrières"
         },
         {
             type: "VP",
-            famille: ["Ludospace", "Van", "Fourgon", "Citadine, Break", "4x4, SUV"]
+            famille: ["Ludospace", "Van", "Fourgon", "Citadine, Break", "4x4, SUV"],
+            help : "Mon véhicule possède des sièges arrières"
         }
     ]
     let famille_de_vehicule = [
@@ -317,7 +319,8 @@ async function main() {
                 name: type.type,
                 familles : {
                     connect: type.famille.map((function(familleName) {return { id: this[familleName] }}), famillesWithId)
-                }
+                },
+                help : type.help
             }
         })
         typesWithId[type.type] = typeWithId.id;

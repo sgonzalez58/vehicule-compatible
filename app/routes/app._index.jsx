@@ -13,13 +13,14 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 export const loader = async ({ request }) => {
-  await authenticate.admin(request);
+  const {session} = await authenticate.admin(request);
   let page = await getPage();
   if(!page){
     page = { id: null, name: "", idShopify: "", url: ""}
   }
   return json({
-    page: page
+    page: page,
+    session
   });
 };
 
@@ -28,7 +29,7 @@ export const action = async ({ request }) => {
 };
 
 export default function Index() {
-  const { page } = useLoaderData();
+  const { page, session } = useLoaderData();
   return (
     <Page>
       <TitleBar title="Compatibilité véhicule">
@@ -55,7 +56,7 @@ export default function Index() {
                 {page.id ? (
                     <Text>
                       La page principale de l'application se trouve aujourd'hui sur la page <a href={"https://admin.shopify.com/store/" + session.shop.split('.').shift() + "/pages/" + page.idShopify.split('/').pop()} target="_blank">{page.name}</a>
-                      <br/>Vous pouvez modifier le nom de la page ci-dessous.
+                      <br/>Vous pouvez modifier le nom de la page <Link url="/app/settings">ici</Link>.
                     </Text>
                   ) : (
                     <Text>
