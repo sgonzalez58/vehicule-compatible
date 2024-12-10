@@ -23,19 +23,58 @@ async function main() {
         "4x4, SUV"
     ]
 	let marques = [
-        "Citroen",
-        "Dacia",
-        "Fiat",
-        "Ford",
-        "Iveco",
-        "Man",
-        "Mercedes",
-        "Nissan",
-        "Opel",
-        "Peugeot",
-        "Renault",
-        "Toyota",
-        "Volkswagen"
+        { 
+            name : "Citroen",
+            logo : "citroen-logo.png"
+        },
+        { 
+            name : "Dacia",
+            logo : ""
+        },
+        { 
+            name : "Fiat",
+            logo : ""
+        },
+        { 
+            name : "Ford",
+            logo : ""
+        },
+        { 
+            name : "Iveco",
+            logo : ""
+        },
+        { 
+            name : "Man",
+            logo : ""
+        },
+        { 
+            name : "Mercedes",
+            logo : ""
+        },
+        { 
+            name : "Nissan",
+            logo : ""
+        },
+        { 
+            name : "Opel",
+            logo : ""
+        },
+        { 
+            name : "Peugeot",
+            logo : ""
+        },
+        { 
+            name : "Renault",
+            logo : ""
+        },
+        { 
+            name : "Toyota",
+            logo : ""
+        },
+        { 
+            name : "Volkswagen",
+            logo : ""
+        }
     ];
     let modeles = [
         {
@@ -282,14 +321,17 @@ async function main() {
     for (const marque of marques){
         let marquewithId = await prisma.marque.upsert({
             where: {
-                name: marque
+                name: marque.name
             },
-            update: {},
+            update: {
+                logo: marque.logo
+            },
             create: {
-				name: marque
+				name: marque.name,
+                logo: marque.logo
 			}
 		})
-        marquesWithId[marque] = marquewithId.id;
+        marquesWithId[marque.name] = marquewithId.id;
     }
     // récupération des id des familles de véhicules
     let famillesWithId = [];
@@ -330,9 +372,9 @@ async function main() {
         let marqueId = null;
         let modeleWithoutMarque = modele.nom;
         for (const marque of marques){
-            if(modeleWithoutMarque.startsWith(marque)){
-                marqueId = marquesWithId[marque];
-                modeleWithoutMarque = modeleWithoutMarque.replace(marque + ' ', '');
+            if(modeleWithoutMarque.startsWith(marque.name)){
+                marqueId = marquesWithId[marque.name];
+                modeleWithoutMarque = modeleWithoutMarque.replace(marque.name + ' ', '');
             }
         }
         await prisma.modele.upsert({

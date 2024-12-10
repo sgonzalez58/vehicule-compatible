@@ -53,6 +53,7 @@ function mainPage(){
                 }
               })
           function recupererModeles(obj){
+            console.log( obj.publicFolder )
             document.getElementsByTagName("main")[0].insertAdjacentHTML("afterbegin", obj.body);
             let form = document.getElementById("vehicule-compatible-form");
             let select_marque = document.getElementById('vehicule-compatible-marque');
@@ -149,7 +150,7 @@ function mainPage(){
                   const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
                   const button_modifier_filtre = document.createElement('button');
                   button_modifier_filtre.innerText = "modifier";
-                  filtre_type.innerHTML = "1 - " + type.getAttribute("value_name");
+                  filtre_type.innerHTML = "Type - " + type.getAttribute("value_name");
                   filtre_type.append(button_modifier_filtre);
                   button_modifier_filtre.addEventListener('click', ()=> etape_type(modeles))
                   etape_famille(modeles_type, type.getAttribute('value'))
@@ -166,10 +167,14 @@ function mainPage(){
             if(produits_wrapper){
               produits_wrapper.remove();
             }
-            filtre_type.innerHTML = "1 - ";
-            filtre_famille.innerHTML = "2 - ";
-            filtre_marque.innerHTML = "3 - ";
-            filtre_modele.innerHTML = "4 - ";
+            filtre_type.innerHTML = "Type - ";
+            filtre_type.setAttribute('is_current_selection', true)
+            filtre_famille.innerHTML = "Famille - ";
+            filtre_famille.setAttribute('is_current_selection', false)
+            filtre_marque.innerHTML = "Marque - ";
+            filtre_marque.setAttribute('is_current_selection', false)
+            filtre_modele.innerHTML = "Modèle - ";
+            filtre_modele.setAttribute('is_current_selection', false)
             const form = document.getElementById("vehicule-compatible-form");
             form.innerHTML = "";
             const types = [];
@@ -198,7 +203,7 @@ function mainPage(){
                   const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
                   const button_modifier_filtre = document.createElement('button');
                   button_modifier_filtre.innerText = "modifier";
-                  filtre_type.innerHTML = "1 - " + type.getAttribute('value_name');
+                  filtre_type.innerHTML = "Type - " + type.getAttribute('value_name');
                   filtre_type.append(button_modifier_filtre);
                   button_modifier_filtre.addEventListener('click', ()=> etape_type(modeles))
                   etape_famille(modeles_type, type.value)
@@ -207,6 +212,7 @@ function mainPage(){
             }
           }
           function etape_famille(modeles, type_id){
+            const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
             const filtre_famille = document.getElementById('compatibilite-vehicule-filtre-famille');
             const filtre_marque = document.getElementById('compatibilite-vehicule-filtre-marque');
             const filtre_modele = document.getElementById('compatibilite-vehicule-filtre-modele');
@@ -214,9 +220,13 @@ function mainPage(){
             if(produits_wrapper){
               produits_wrapper.remove();
             }
-            filtre_famille.innerHTML = "2 - ";
-            filtre_marque.innerHTML = "3 - ";
-            filtre_modele.innerHTML = "4 - ";
+            filtre_type.setAttribute('is_current_selection', false)
+            filtre_famille.innerHTML = "Famille - ";
+            filtre_famille.setAttribute('is_current_selection', true)
+            filtre_marque.innerHTML = "Marque - ";
+            filtre_marque.setAttribute('is_current_selection', false)
+            filtre_modele.innerHTML = "Modèle - ";
+            filtre_modele.setAttribute('is_current_selection', false)
             const form = document.getElementById("vehicule-compatible-form");
             form.innerHTML = "";
             const familles = [];
@@ -243,7 +253,7 @@ function mainPage(){
                 modeles_famille = modeles.filter((modele) => modele.famille.id == famille.value);
                 const button_modifier_famille = document.createElement('button');
                 button_modifier_famille.innerText = "modifier";
-                filtre_famille.innerText = "2 - " + famille.getAttribute('value_name');
+                filtre_famille.innerText = "Famille - " + famille.getAttribute('value_name');
                 filtre_famille.append(button_modifier_famille);
                 button_modifier_famille.addEventListener('click', ()=> etape_famille(modeles_type, type_id))
                 etape_marque(modeles_famille, type_id)
@@ -251,14 +261,20 @@ function mainPage(){
             })
           }
           function etape_marque(modeles, type_id){
+            const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
+            const filtre_famille = document.getElementById('compatibilite-vehicule-filtre-famille');
             const filtre_marque = document.getElementById('compatibilite-vehicule-filtre-marque');
             const filtre_modele = document.getElementById('compatibilite-vehicule-filtre-modele');
             const produits_wrapper = document.getElementsByClassName('compatibilite-vehicule-produits-wrapper')[0];
             if(produits_wrapper){
               produits_wrapper.remove();
             }
-            filtre_marque.innerHTML = "3 - ";
-            filtre_modele.innerHTML = "4 - ";
+            filtre_type.setAttribute('is_current_selection', false)
+            filtre_famille.setAttribute('is_current_selection', false)
+            filtre_marque.innerHTML = "Marque - ";
+            filtre_marque.setAttribute('is_current_selection', true)
+            filtre_modele.innerHTML = "Modèle - ";
+            filtre_modele.setAttribute('is_current_selection', false)
             let form = document.getElementById("vehicule-compatible-form");
             form.innerHTML = "";
             let marques = [];
@@ -266,7 +282,12 @@ function mainPage(){
               if(!marques.includes(modele.marque.id)){
                 marques.push(modele.marque.id)
                 const choix = document.createElement("label");
+                const image_choix = document.createElement("img");
+                image_choix.setAttribute('src', obj.publicFolder + "/assets/" + modele.marque.logo);
+                image_choix.setAttribute('alt', "logo " + modele.marque.name);
+                image_choix.setAttribute('height', "75");
                 choix.innerText = modele.marque.name;
+                choix.appendChild(image_choix);
                 const choix_value = document.createElement("input");
                 choix_value.value = modele.marque.id;
                 choix.setAttribute('for', 'vehicule-compatible-form-checkbox-marque-'+modele.marque.id);
@@ -286,7 +307,7 @@ function mainPage(){
                 const filtre_marque = document.getElementById('compatibilite-vehicule-filtre-marque');
                 const button_modifier_marque = document.createElement('button');
                 button_modifier_marque.innerText = "modifier";
-                filtre_marque.innerHTML = "3 - " + marque.getAttribute('value_name');
+                filtre_marque.innerHTML = "Marque - " + marque.getAttribute('value_name');
                 filtre_marque.append(button_modifier_marque);
                 button_modifier_marque.addEventListener('click', ()=> etape_marque(modeles_famille, type_id))
                 etape_modele(modeles_marque, type_id)
@@ -294,12 +315,19 @@ function mainPage(){
             })
           }   
           function etape_modele(modeles, type_id){
+            const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
+            const filtre_famille = document.getElementById('compatibilite-vehicule-filtre-famille');
+            const filtre_marque = document.getElementById('compatibilite-vehicule-filtre-marque');
             const filtre_modele = document.getElementById('compatibilite-vehicule-filtre-modele');
             const produits_wrapper = document.getElementsByClassName('compatibilite-vehicule-produits-wrapper')[0];
             if(produits_wrapper){
               produits_wrapper.remove();
             }
-            filtre_modele.innerHTML = "4 - ";
+            filtre_type.setAttribute('is_current_selection', false)
+            filtre_famille.setAttribute('is_current_selection', false)
+            filtre_marque.setAttribute('is_current_selection', false)
+            filtre_modele.innerHTML = "Modèle - ";
+            filtre_modele.setAttribute('is_current_selection', true)
             let form = document.getElementById("vehicule-compatible-form");
             form.innerHTML = "";
             for (const modele of modeles){
@@ -323,7 +351,7 @@ function mainPage(){
                 const filtre_modele = document.getElementById('compatibilite-vehicule-filtre-modele');
                 const button_modifier_modele = document.createElement('button');
                 button_modifier_modele.innerText = "modifier";
-                filtre_modele.innerHTML = "4 - " + modeleCheckbox.getAttribute('value_name');
+                filtre_modele.innerHTML = "Modèle - " + modeleCheckbox.getAttribute('value_name');
                 filtre_modele.append(button_modifier_modele);
                 button_modifier_modele.addEventListener('click', ()=> etape_modele(modeles_marque, type_id))
                 get_produit_modele(modele, type_id)
@@ -331,6 +359,14 @@ function mainPage(){
             })
           }
           function get_produit_modele(modele, type_id){
+            const filtre_type = document.getElementById('compatibilite-vehicule-filtre-type');
+            const filtre_famille = document.getElementById('compatibilite-vehicule-filtre-famille');
+            const filtre_marque = document.getElementById('compatibilite-vehicule-filtre-marque');
+            const filtre_modele = document.getElementById('compatibilite-vehicule-filtre-modele');
+            filtre_type.setAttribute('is_current_selection', false)
+            filtre_famille.setAttribute('is_current_selection', false)
+            filtre_marque.setAttribute('is_current_selection', false)
+            filtre_modele.setAttribute('is_current_selection', false)
             let form = document.getElementById("vehicule-compatible-form");
             form.innerHTML = "";
             let wrapper_compatibilite = document.getElementsByClassName("compatibilite-vehicule-wrapper")[0];
@@ -415,12 +451,16 @@ function mainPage(){
             padding: 10px;
             align-items:center;
             justify-content: center;
-            gap: 10px 20px;
+            gap: 10px 30px;
           }
           .compatibilite-vehicule-filtre{
             display:flex;
             flex-wrap:nowrap;
             gap:10px;
+          }
+          .compatibilite-vehicule-filtre[is_current_selection=true]{
+            font-weight:700;
+            font-size: 1.2em;
           }
           .compatibilite-vehicule-wrapper form{
             display:flex;

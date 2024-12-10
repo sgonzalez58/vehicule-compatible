@@ -56,6 +56,7 @@ model Type {
 model Marque {
   id            Int       @id @default(autoincrement())
   modeles       Modele[]
+  logo          String    @default("")
   name          String    @unique
 }
 

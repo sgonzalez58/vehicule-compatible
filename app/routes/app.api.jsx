@@ -80,16 +80,16 @@ export const loader = async ({request}) => {
                 <div class="compatibilite-vehicule-wrapper">
                 <h2>Vérifiez la compatibilité de votre véhicule</h2>
                 <div class="compatibilite-vehicule-filtres">
-                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-type">
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-type" is_current_selection="true">
                     Type - 
                   </div>
-                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-famille">
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-famille" is_current_selection="false">
                     Famille - 
                   </div>
-                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-marque">
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-marque" is_current_selection="false">
                     Marque - 
                   </div>
-                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-modele">
+                  <div class="compatibilite-vehicule-filtre" id="compatibilite-vehicule-filtre-modele" is_current_selection="false">
                     Modele - 
                   </div>
                 </div>
@@ -109,6 +109,7 @@ export const loader = async ({request}) => {
   return json({
     modeles: await getVehicules(),
     body: page,
-    appPage: appPage.url
+    appPage: appPage.url,
+    publicFolder: process.env.PUBLIC_URL 
   })
 };
