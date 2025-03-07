@@ -27,6 +27,7 @@ export async function loader({ request, params }) {
     return json({
       destination: "marque",
       name: "",
+      logo: ""
     });
   }
 
@@ -78,7 +79,8 @@ export default function marqueForm() {
   const submit = useSubmit();
   function handleSave() {
     const data = {
-      name: formState.name
+      name: formState.name,
+      logo: formState.logo
     };
 
     setCleanFormState({ ...formState });
@@ -109,6 +111,17 @@ export default function marqueForm() {
                   value={formState.name}
                   onChange={(name) => setFormState({ ...formState, name })}
                   error={errors.name}
+                />
+                
+                <TextField
+                  id="logo"
+                  helpText="Le logo de la marque"
+                  label="logo"
+                  labelHidden
+                  autoComplete="off"
+                  value={formState.logo}
+                  onChange={(logo) => setFormState({ ...formState, logo })}
+                  error={errors.logo}
                 />
               </BlockStack>
             </Card>

@@ -39,7 +39,7 @@ export async function loader({ params, request }) {
   const { session } = await authenticate.admin(request);
   if (params.id === "new") {
     return json({
-      produit: { destination : "produit", productId: null, productName: "", productImage: "", productUrl: "", productPrice: 0, modeles: []},
+      produit: { destination : "produit", productId: null, productName: "", productImage: "", productUrl: "", productPrice: 0, infosComplementaires: '', modeles: []},
       modeles: await getModeles(),
       session,
       marques : await getMarques(),
@@ -136,7 +136,7 @@ export default function modeleForm() {
         productName: title,
         productImage: images[0]?.originalSrc,
         productUrl: "/products/" + handle,
-        productPrice: minimum_price
+        productPrice: minimum_price,
       })
     }
   }

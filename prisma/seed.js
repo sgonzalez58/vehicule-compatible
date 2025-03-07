@@ -7,12 +7,12 @@ async function main() {
         {
             type: "VU",
             famille: ["Ludospace", "Van", "Fourgon"],
-            help: "Mon véhicule ne possède pas de sièges arrières"
+            help: "Mon véhicule est un utilitaire (cabine tolée ou approfondie)"
         },
         {
             type: "VP",
             famille: ["Ludospace", "Van", "Fourgon", "Citadine, Break", "4x4, SUV"],
-            help : "Mon véhicule possède des sièges arrières"
+            help : "Mon véhicule est un tourisme (sièges, fenêtres, portes)"
         }
     ]
     let famille_de_vehicule = [
@@ -25,55 +25,55 @@ async function main() {
 	let marques = [
         { 
             name : "Citroen",
-            logo : "citroen-logo.png"
+            logo : "https://upload.wikimedia.org/wikipedia/fr/e/e9/Citroen_logo.svg"
         },
         { 
             name : "Dacia",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/a/a1/Dacia-logo.png"
         },
         { 
             name : "Fiat",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/b/b5/FIAT_logo_%282020%29.svg"
         },
         { 
             name : "Ford",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/3/3e/Ford_logo_flat.svg"
         },
         { 
             name : "Iveco",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/f/f7/Iveco_Logo_2023.svg"
         },
         { 
             name : "Man",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/5/54/Logo_MAN.png"
         },
         { 
             name : "Mercedes",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/3/32/Mercedes-Benz_Star_2022.svg"
         },
         { 
             name : "Nissan",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/2/23/Nissan_2020_logo.svg"
         },
         { 
             name : "Opel",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/2/2b/Opel_logo_2023.svg"
         },
         { 
             name : "Peugeot",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/fr/9/9d/Peugeot_2021_Logo.svg"
         },
         { 
             name : "Renault",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/b/b7/Renault_2021_Text.svg"
         },
         { 
             name : "Toyota",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/5/5e/Toyota_EU.svg"
         },
         { 
             name : "Volkswagen",
-            logo : ""
+            logo : "https://upload.wikimedia.org/wikipedia/commons/6/6d/Volkswagen_logo_2019.svg"
         }
     ];
     let modeles = [
@@ -214,7 +214,7 @@ async function main() {
         },
         {
             nom : "Nissan NV400",
-            type: ["VU", "VP"],
+            type: ["VU"],
             famille: "Fourgon"
         },
         {

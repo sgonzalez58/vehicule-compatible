@@ -53,7 +53,7 @@ function mainPage(){
                 }
               })
           function recupererModeles(obj){
-            console.log( obj.publicFolder )
+            console.log( obj )
             document.getElementsByTagName("main")[0].insertAdjacentHTML("afterbegin", obj.body);
             let form = document.getElementById("vehicule-compatible-form");
             let select_marque = document.getElementById('vehicule-compatible-marque');
@@ -283,11 +283,12 @@ function mainPage(){
                 marques.push(modele.marque.id)
                 const choix = document.createElement("label");
                 const image_choix = document.createElement("img");
-                image_choix.setAttribute('src', obj.publicFolder + "/assets/" + modele.marque.logo);
+                image_choix.setAttribute('src', modele.marque.logo);
                 image_choix.setAttribute('alt', "logo " + modele.marque.name);
                 image_choix.setAttribute('height', "75");
                 choix.innerText = modele.marque.name;
                 choix.appendChild(image_choix);
+                choix.setAttribute('class', 'vehicule-compatible-form-label-marque');
                 const choix_value = document.createElement("input");
                 choix_value.value = modele.marque.id;
                 choix.setAttribute('for', 'vehicule-compatible-form-checkbox-marque-'+modele.marque.id);
@@ -379,7 +380,7 @@ function mainPage(){
             for (const modeleType of modele.modeleTypes){
               if(modeleType.typeId == type_id){
                 let produits_flex = document.createElement('div');
-                produits_flex.setAttribute('class', "compatibilite-vehicule-produits-flex");
+                produits_flex.setAttribute('class', "compatibilite-vehicule-produits-grid");
                 if(modeleType.produits.length == 0){
                   let produits_flex_pas_de_produits = document.createElement('p');
                   produits_flex_pas_de_produits.setAttribute('class', 'compatibilite-vehicule-message');
@@ -391,18 +392,23 @@ function mainPage(){
                   produit_wrapper.setAttribute('href', produit.productUrl);
                   produit_wrapper.setAttribute('class', "compatibilite-vehicule-produit");
 
+                  let produit_info_principal = document.createElement('div');
+                  produit_info_principal.setAttribute('class', 'compatibilite-vehicule-produit-info-principal')
+
                   let produit_image = document.createElement('img');
                   produit_image.setAttribute('src', produit.productImage);
-                  produit_image.setAttribute('width', 400);
-                  produit_wrapper.appendChild(produit_image);
+                  produit_image.setAttribute('width', 150);
+                  produit_info_principal.appendChild(produit_image);
+
+                  let produit_title = document.createElement('h3');
+                  produit_title.innerText = produit.productName;
+                  produit_info_principal.appendChild(produit_title);
+
+                  produit_wrapper.appendChild(produit_info_principal)
 
                   let produit_infos = document.createElement('div');
                   produit_infos.setAttribute('class', "compatibilite-vehicule-produit-info");
                   produit_wrapper.appendChild(produit_infos);
-
-                  let produit_title = document.createElement('h3');
-                  produit_title.innerText = produit.productName;
-                  produit_infos.appendChild(produit_title);
 
                   if(produit.infosComplementaires != ""){
                     let produit_infos_complementaires = document.createElement('p');
@@ -474,6 +480,7 @@ function mainPage(){
           }
           .vehicule-compatible-form-checkbox-type-label, .vehicule-compatible-form-checkbox-famille-label, .vehicule-compatible-form-checkbox-marque-label, .vehicule-compatible-form-checkbox-modele-label{
             display:flex;
+            flex-direction:column-reverse;
             align-items:center;
             justify-content: center;
             background-color: #E8E8E8;
@@ -518,13 +525,16 @@ function mainPage(){
           .compatibilite-vehicule-produits-wrapper h2{
             text-align:center;
           }
-          .compatibilite-vehicule-produits-flex{
-            display:flex;
-            flex-direction:column;
+          .compatibilite-vehicule-produits-grid{
+            display:grid;
+            grid-template-columns: repeat(auto-fill, 400px);
             gap:10px;
           }
+
           .compatibilite-vehicule-produit{
             display:flex;
+            flex-direction: column;
+            align-items:center;
             gap:20px;
             padding:20px;
             border:1px solid #242424;
@@ -533,18 +543,26 @@ function mainPage(){
             text-decoration: none;
             color:black;
           }
+
+          .compatibilite-vehicule-produit-info-principal{
+            display:flex;
+            align-items:center;
+            gap:20px;
+          }
+            
           .compatibilite-vehicule-produit-info{
             display:flex;
             flex-direction: column;
-            padding: 30px 0;
             justify-content:space-between;
             width:100%;
+            align-items:center;
           }
           .compatibilite-vehicule-produit-info h3{
             font-size:2em;
           }
           .compatibilite-vehicule-produit-info p {
             font-size:1.6em;
+            margin:0;
           }
           .compatibilite-vehicule-produit-info span{
             color:#ff7d24;
@@ -560,8 +578,6 @@ function mainPage(){
             justify-content:center;
             color:white;
             font-size:1.1em;
-            align-self:end;
-            margin-right:30px;
           }
         </style>`
 }

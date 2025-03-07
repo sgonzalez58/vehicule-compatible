@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://tan-vision-guarantee-manager.trycloudflare.com"
+application_url = "https://ob-scratch-subscriptions-heat.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_content"
 
 [auth]
 redirect_urls = [
-  "https://tan-vision-guarantee-manager.trycloudflare.com/auth/callback",
-  "https://tan-vision-guarantee-manager.trycloudflare.com/auth/shopify/callback",
-  "https://tan-vision-guarantee-manager.trycloudflare.com/api/auth/callback"
+  "https://ob-scratch-subscriptions-heat.trycloudflare.com/auth/callback",
+  "https://ob-scratch-subscriptions-heat.trycloudflare.com/auth/shopify/callback",
+  "https://ob-scratch-subscriptions-heat.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -42,7 +42,7 @@ api_version = "2024-10"
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://tan-vision-guarantee-manager.trycloudflare.com/app/api"
+url = "https://ob-scratch-subscriptions-heat.trycloudflare.com/app/api"
 subpath = "vehicule-compatible"
 prefix = "apps"
 
