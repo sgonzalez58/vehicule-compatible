@@ -380,12 +380,12 @@ function mainPage(){
             for (const modeleType of modele.modeleTypes){
               if(modeleType.typeId == type_id){
                 let produits_flex = document.createElement('div');
-                produits_flex.setAttribute('class', "compatibilite-vehicule-produits-grid");
+                produits_flex.setAttribute('class', "compatibilite-vehicule-produits-flex");
                 if(modeleType.produits.length == 0){
                   let produits_flex_pas_de_produits = document.createElement('p');
                   produits_flex_pas_de_produits.setAttribute('class', 'compatibilite-vehicule-message');
                   produits_flex_pas_de_produits.innerText = "Nous sommes désolés, aucun de nos produits n'est compatible avec votre véhicule.";
-                  produits_flex.appendChild(produits_flex_pas_de_produits);
+                  wrapper_produits.appendChild(produits_flex_pas_de_produits);
                 }
                 for (const produit of modeleType.produits){
                   let produit_wrapper = document.createElement('a');
@@ -400,9 +400,19 @@ function mainPage(){
                   produit_image.setAttribute('width', 150);
                   produit_info_principal.appendChild(produit_image);
 
+                  let produit_infos_principales_inner_text_container = document.createElement('div');
+                  produit_infos_principales_inner_text_container.setAttribute('class', 'compatibilite-vehicule-produit-info-principal-text-container')
+
                   let produit_title = document.createElement('h3');
                   produit_title.innerText = produit.productName;
-                  produit_info_principal.appendChild(produit_title);
+                  produit_infos_principales_inner_text_container.appendChild(produit_title);
+
+                  let produit_prix = document.createElement('p');
+                  produit_prix.setAttribute('class', 'compatibilite-vehicule-produit-prix')
+                  produit_prix.innerHTML = "A partir de <span>" + String(produit.productPrice).replace('.', ',') + "€</span>";
+                  produit_infos_principales_inner_text_container.appendChild(produit_prix);
+
+                  produit_info_principal.appendChild(produit_infos_principales_inner_text_container);
 
                   produit_wrapper.appendChild(produit_info_principal)
 
@@ -416,10 +426,6 @@ function mainPage(){
                     produit_infos_complementaires.innerText = produit.infosComplementaires;
                     produit_infos.appendChild(produit_infos_complementaires);
                   }
-
-                  let produit_prix = document.createElement('p');
-                  produit_prix.innerHTML = "A partir de <span>" + String(produit.productPrice).replace('.', ',') + "€</span>";
-                  produit_infos.appendChild(produit_prix);
 
                   let produit_bouton = document.createElement('div');
                   produit_bouton.innerText = "Voir le produit";
@@ -525,14 +531,17 @@ function mainPage(){
           .compatibilite-vehicule-produits-wrapper h2{
             text-align:center;
           }
-          .compatibilite-vehicule-produits-grid{
-            display:grid;
-            grid-template-columns: repeat(auto-fill, 400px);
+          .compatibilite-vehicule-produits-flex{
+            display:flex;
+            justify-content:center;
+            flex-wrap:wrap;
             gap:10px;
+            align-items:center;
           }
 
           .compatibilite-vehicule-produit{
             display:flex;
+            width:390px;
             flex-direction: column;
             align-items:center;
             gap:20px;
@@ -549,6 +558,20 @@ function mainPage(){
             align-items:center;
             gap:20px;
           }
+
+          .compatibilite-vehicule-produit-info-principal-text-container{
+            display: flex;
+            flex-direction: column;
+          }
+
+          .compatibilite-vehicule-produit-prix{
+            font-size:1.2em;
+          }
+
+          .compatibilite-vehicule-produit-prix span{
+            color:#ff7d24;
+            font-weight:500;
+          }
             
           .compatibilite-vehicule-produit-info{
             display:flex;
@@ -556,18 +579,15 @@ function mainPage(){
             justify-content:space-between;
             width:100%;
             align-items:center;
+            gap: 16px;
           }
-          .compatibilite-vehicule-produit-info h3{
-            font-size:2em;
-          }
+
           .compatibilite-vehicule-produit-info p {
-            font-size:1.6em;
+            font-size:1.1em;
+            text-align:center;
             margin:0;
           }
-          .compatibilite-vehicule-produit-info span{
-            color:#ff7d24;
-            font-weight:500;
-          }
+
           .compatibilite-vehicule-produit-info div{
             padding: 6px 14px;
             border-radius: 5px;
