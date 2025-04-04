@@ -476,9 +476,8 @@ function mainPage(){
           }
           .compatibilite-vehicule-wrapper form{
             display:flex;
-            justify-content:center;;
-            padding:20px;
-            gap: 10px 20px;
+            justify-content:center;
+            gap: 0 20px;
             flex-wrap:wrap;
           }
           .vehicule-compatible-form-checkbox-type, .vehicule-compatible-form-checkbox-famille, .vehicule-compatible-form-checkbox-marque, .vehicule-compatible-form-checkbox-modele{
@@ -496,6 +495,11 @@ function mainPage(){
             padding: 20px;
             text-align:center;
             cursor:pointer;
+            margin: 10px 0;
+          }
+
+          .vehicule-compatible-form-checkbox-marque-label img{
+            max-width:150px;
           }
           .vehicule-compatible-form-checkbox-type-label:active, .vehicule-compatible-form-checkbox-famille-label:active, .vehicule-compatible-form-checkbox-marque-label:active, .vehicule-compatible-form-checkbox-modele-label:active{
             background-color: #D0D0D0;
