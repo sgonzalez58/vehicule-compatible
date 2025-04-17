@@ -14,6 +14,7 @@ if (
   delete process.env.HOST;
 }
 
+
 const host = new URL(process.env.SHOPIFY_APP_URL || "http://localhost")
   .hostname;
 let hmrConfig;
@@ -46,6 +47,16 @@ export default defineConfig({
   plugins: [
     remix({
       ignoredRouteFiles: ["**/.*"],
+      appDirectory: "app",
+      serverModuleFormat: "cjs",
+      dev: { port: process.env.HMR_SERVER_PORT || 8002 },
+      future: {
+        v3_throwAbortReason: true,
+        v3_relativeSplatPath: true,
+        v3_fetcherPersist: true,
+        v3_singleFetch: true,
+        v3_lazyRouteDiscovery: true
+      },
     }),
     tsconfigPaths(),
   ],
