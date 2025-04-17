@@ -3,7 +3,7 @@
 client_id = "04ff22b57a04144cfbbedcede3280b14"
 name = "vehicule-compatible"
 handle = "vehicule-compatible"
-application_url = "https://jewel-thats-worldwide-lens.trycloudflare.com"
+application_url = "https://spaces-common-males-laboratory.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "read_products,write_content"
 
 [auth]
 redirect_urls = [
-  "https://jewel-thats-worldwide-lens.trycloudflare.com/auth/callback",
-  "https://jewel-thats-worldwide-lens.trycloudflare.com/auth/shopify/callback",
-  "https://jewel-thats-worldwide-lens.trycloudflare.com/api/auth/callback"
+  "https://spaces-common-males-laboratory.trycloudflare.com/auth/callback",
+  "https://spaces-common-males-laboratory.trycloudflare.com/auth/shopify/callback",
+  "https://spaces-common-males-laboratory.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -42,7 +42,7 @@ api_version = "2024-10"
   uri = "/webhooks/app/uninstalled"
 
 [app_proxy]
-url = "https://jewel-thats-worldwide-lens.trycloudflare.com/app/api"
+url = "https://spaces-common-males-laboratory.trycloudflare.com/app/api"
 subpath = "vehicule-compatible"
 prefix = "apps"
 
